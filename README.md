@@ -10,6 +10,14 @@
 
 **[[:space_invader:](https://github.com/behei/opencv_sms)] Detect a human on the frame using different Haar-cascade classifiers**
 
+**[[:clapper:](https://www.youtube.com/watch?v=Kend6gDyRws)] Антон Мальцев: Выбор Edge платформы для Computer Vision проекта**
+
+**[[:clapper:](https://www.youtube.com/watch?v=MS4ig5BO50Y)] Леонид Штанько: Кулсториз из видеоаналитики в ограниченных ресурсах**
+
+**[[:clapper:](https://www.youtube.com/watch?v=vrSCD88X8BU&t=18692s)] Седьмой рождественский коллоквиум по компьютерному зрению — 28 декабря 2021**
+
+**[[:computer:](https://lpcv.ai)] CVPR WORKSHOP 2021**
+
 ### INPUT DATA
 
-**[[:clapper:](https://cloud.mail.ru/public/uVnz/cFVricRmK/)] - Входные данные (100 видео)**
+**[[:clapper:](https://cloud.mail.ru/public/uVnz/cFVricRmK/)] Входные данные (100 видео)**
