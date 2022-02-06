@@ -24,3 +24,5 @@
 ### INPUT DATA
 
 **[[:clapper:](https://cloud.mail.ru/public/uVnz/cFVricRmK/)] Входные данные (100 видео)**
+
+:oil:
