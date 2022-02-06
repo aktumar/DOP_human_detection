@@ -1,6 +1,6 @@
 # Scientific Research on Human detection in UNT (UNIFIED NATIONAL TESTING)
 
-## Содержание
+## Content
 
 - [:scroll: Papers](#paper)
 - [:clapper: Video](#video)
