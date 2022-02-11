@@ -2,7 +2,7 @@ import cv2
 import os
 
 # cap = cv2.VideoCapture('rtsp://[username]:[password]@[IP]:554/Streaming/Channels/1/')
-RTSP_URL = 'rtsp://admin:Ustudy101@10.200.11.4:554/ISAPI/Streaming/Channels/101'
+RTSP_URL = ''
 
 os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
 
