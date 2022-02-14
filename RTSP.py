@@ -1,13 +1,26 @@
 import cv2
 import os
+import configparser
+
+config = configparser.ConfigParser()
+config.read("settings.ini")
+
+SYSTEM = '151'
+USERNAME = config[SYSTEM]["USERNAME"]
+PASSWORD = config[SYSTEM]["PASSWORD"]
+IP_ADDRESS = config[SYSTEM]["IP_ADDRESS"]
+PORT = config[SYSTEM]["PORT"]
+DIR = config[SYSTEM]["DIR"]
+COMPUTER = config[SYSTEM]["COMPUTER"]
 
 # cap = cv2.VideoCapture('rtsp://[username]:[password]@[IP]:554/Streaming/Channels/1/')
-RTSP_URL = ''
+RTSP_URL = f'rtsp://{USERNAME}:{PASSWORD}@{IP_ADDRESS}:{PORT}/{DIR}/Streaming/Channels/{COMPUTER}'
 
 """
 Windows
 """
 # cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+
 
 """
 Ubuntu

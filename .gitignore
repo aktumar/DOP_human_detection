@@ -130,3 +130,6 @@ dmypy.json
 
 # разве это нужно
 .idea/
+
+# secret
+settings.ini
