@@ -4,9 +4,15 @@ import os
 # cap = cv2.VideoCapture('rtsp://[username]:[password]@[IP]:554/Streaming/Channels/1/')
 RTSP_URL = ''
 
-os.environ['OPENCV_FFMPEG_CAPTURE_OPTIONS'] = 'rtsp_transport;udp'
+"""
+Windows
+"""
+# cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
 
-cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+"""
+Ubuntu
+"""
+cap = cv2.VideoCapture(RTSP_URL)
 
 if not cap.isOpened():
     print('Cannot open RTSP stream')
