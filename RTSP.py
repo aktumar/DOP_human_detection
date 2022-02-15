@@ -19,6 +19,7 @@ RTSP_URL = f'rtsp://{USERNAME}:{PASSWORD}@{IP_ADDRESS}:{PORT}/{DIR}/Streaming/Ch
 """
 Windows
 """
+# os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
 # cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
 
 
