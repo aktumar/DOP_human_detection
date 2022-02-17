@@ -133,3 +133,4 @@ dmypy.json
 
 # secret
 settings.ini
+protocol.conf

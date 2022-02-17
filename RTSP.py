@@ -1,8 +1,22 @@
-import cv2
 import os
+import cv2
 import configparser
+from sys import platform
 
-config = configparser.ConfigParser()
+"""
+OS platform
+"""
+os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
+if platform == "linux" or platform == "linux2":
+    apiPreference = None
+elif platform == "win32":
+    apiPreference = None
+    # apiPreference = cv2.CAP_FFMPEG
+
+"""
+Camera configuration
+"""
+config = (configparser.ConfigParser())
 config.read("settings.ini")
 
 SYSTEM = '151'
@@ -13,31 +27,28 @@ PORT = config[SYSTEM]["PORT"]
 DIR = config[SYSTEM]["DIR"]
 COMPUTER = config[SYSTEM]["COMPUTER"]
 
-# cap = cv2.VideoCapture('rtsp://[username]:[password]@[IP]:554/Streaming/Channels/1/')
 RTSP_URL = f'rtsp://{USERNAME}:{PASSWORD}@{IP_ADDRESS}:{PORT}/{DIR}/Streaming/Channels/{COMPUTER}'
 
-"""
-Windows
-"""
-# os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
-# cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+
+def main():
+    cap = cv2.VideoCapture(RTSP_URL, apiPreference)
+
+    if not cap.isOpened():
+        print('Cannot open RTSP stream')
+        exit(-1)
+
+    while True:
+        _, frame = cap.read()
+        cv2.imshow('RTSP stream', frame)
+
+        if cv2.waitKey(1) == 27:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 
-"""
-Ubuntu
-"""
-cap = cv2.VideoCapture(RTSP_URL)
+if __name__ == "__main__":
+    main()
 
-if not cap.isOpened():
-    print('Cannot open RTSP stream')
-    exit(-1)
-
-while True:
-    _, frame = cap.read()
-    cv2.imshow('RTSP stream', frame)
-
-    if cv2.waitKey(1) == 27:
-        break
-
-cap.release()
-cv2.destroyAllWindows()
+print("Guru99")
