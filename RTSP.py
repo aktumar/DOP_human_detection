@@ -12,7 +12,7 @@ global api_preferences
 CONFIG_FILE = "settings.ini"
 # SYSTEM = ['151', '155', '157']
 # SYSTEM = ['151_min', '155_min', '157_min']
-SYSTEM = ['155']
+SYSTEM = ['155_min']
 
 """
 OS platform
@@ -119,8 +119,8 @@ def file_open(file, sys, api_preferences):
     while True:
         _, frame = cap.read()
 
-        image_contour_finder(frame)
-        # image_delete_background(frame)
+        # image_contour_finder(frame)
+        image_delete_background(frame)
         # image_delete_background_upgrade(frame)
 
         cv2.imshow(sys, frame)
@@ -138,8 +138,12 @@ def request_type(args):
         file_open(0, 'Camera', None)
     elif args['video'] is not None:
         print('[INFO] Opening Video from path.')
-        path = 'C:/Users/rakhymova.a/Desktop/vid/'
-        file = '1.mp4'
+        if platform == "win32":
+            path = 'C:/Users/rakhymova.a/Desktop/vid/'
+            file = '1.mp4'
+        elif platform == "linux" or platform == "linux2":
+            path = '/home/aktumar/my_projects/video_UNT/'
+            file = '1.mp4'
         file_open(path + file, file, None)
     elif args['url'] is not None:
         print('[INFO] Opening URL of Real-Time Streaming Protocol.')

@@ -2,7 +2,7 @@
 
 ## Content
 
-- [:scroll: Papers](#paper)
+- [:scroll: Researches](#res)
 - [:clapper: Video](#video)
 - [:space_invader: GitHub](#git)
 - [:computer: Web-papers](#web)
@@ -10,13 +10,11 @@
 
 
 
-<a name="paper" />
+<a name="res" />
 
-## Papers
+## Researches
 
-**[:scroll:]**
-
-
+**SLICING AIDED HYPER INFERENCE AND FINE-TUNING FOR SMALL OBJECT DETECTION [[:scroll:](https://arxiv.org/pdf/2202.06934v1.pdf)], [[:space_invader:](https://github.com/obss/sahi)], [[:computer:](https://www.kaggle.com/remekkinas/sahi-slicing-aided-hyper-inference-yv5-and-yx)], [[Dataset](https://paperswithcode.com/dataset/xview)]**
 
 
 
@@ -39,6 +37,8 @@
 ## GitHub
 
 **[[:space_invader:](https://github.com/behei/opencv_sms)] Detect a human on the frame using different Haar-cascade classifiers**
+
+**[[:space_invader:](https://github.com/facebookresearch/detectron2)] Detectron2**
 
 
 
