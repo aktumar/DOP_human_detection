@@ -2,11 +2,12 @@
 
 ## Content
 
-- [:scroll: Researches](#res)
+- [Researches](#res)
 - [:clapper: Video](#video)
 - [:space_invader: GitHub](#git)
 - [:computer: Web-papers](#web)
 - [:fuelpump: Input data](#in)
+- [:scroll: Paper](#paper)
 
 
 
