@@ -20,8 +20,12 @@ OS platform
 if platform == "win32":
     os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
     api_preferences = cv2.CAP_FFMPEG
+    path = 'C:/Users/rakhymova.a/Desktop/vid/'
+    file = '1.mp4'
 elif platform == "linux" or platform == "linux2":
     api_preferences = None
+    path = '/home/aktumar/my_projects/video_UNT/'
+    file = '1.mp4'
 
 """
 Camera configuration
@@ -119,8 +123,8 @@ def file_open(file, sys, api_preferences):
     while True:
         _, frame = cap.read()
 
-        # image_contour_finder(frame)
-        image_delete_background(frame)
+        image_contour_finder(frame)
+        # image_delete_background(frame)
         # image_delete_background_upgrade(frame)
 
         cv2.imshow(sys, frame)
@@ -138,12 +142,6 @@ def request_type(args):
         file_open(0, 'Camera', None)
     elif args['video'] is not None:
         print('[INFO] Opening Video from path.')
-        if platform == "win32":
-            path = 'C:/Users/rakhymova.a/Desktop/vid/'
-            file = '1.mp4'
-        elif platform == "linux" or platform == "linux2":
-            path = '/home/aktumar/my_projects/video_UNT/'
-            file = '1.mp4'
         file_open(path + file, file, None)
     elif args['url'] is not None:
         print('[INFO] Opening URL of Real-Time Streaming Protocol.')
