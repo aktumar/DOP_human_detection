@@ -2,7 +2,7 @@
 
 ## Content
 
-- [Researches](#res)
+- [Researches & Products](#res)
 - [:clapper: Video](#video)
 - [:space_invader: GitHub](#git)
 - [:computer: Web-papers](#web)
@@ -13,9 +13,11 @@
 
 <a name="res" />
 
-## Researches
+## Researches & Products
 
-**SLICING AIDED HYPER INFERENCE AND FINE-TUNING FOR SMALL OBJECT DETECTION [[:scroll:](https://arxiv.org/pdf/2202.06934v1.pdf)], [[:space_invader:](https://github.com/obss/sahi)], [[:computer:](https://www.kaggle.com/remekkinas/sahi-slicing-aided-hyper-inference-yv5-and-yx)], [[Dataset](https://paperswithcode.com/dataset/xview)]**
+**SLICING AIDED HYPER INFERENCE AND FINE-TUNING FOR SMALL OBJECT DETECTION [[:scroll:](https://arxiv.org/pdf/2202.06934v1.pdf)], [[:space_invader:](https://github.com/obss/sahi)], [[:computer:](https://www.kaggle.com/remekkinas/sahi-slicing-aided-hyper-inference-yv5-and-yx)], [[:fuelpump:](https://paperswithcode.com/dataset/xview)]**
+
+**YOLO: Real-Time Object Detection [[:scroll:](https://pjreddie.com/media/files/papers/YOLOv3.pdf)], [[:space_invader:](https://github.com/pjreddie/darknet)], [[:computer:](https://pjreddie.com/darknet/yolo/)], [[:clapper:](https://www.youtube.com/watch?v=MPU2HistivI)]** 
 
 
 
