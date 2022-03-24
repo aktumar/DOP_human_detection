@@ -10,9 +10,9 @@ VARIABLES
 """
 global api_preferences
 CONFIG_FILE = "settings.ini"
-# SYSTEM = ['151', '155', '157']
+SYSTEM = ['151', '155', '157']
 # SYSTEM = ['151_min', '155_min', '157_min']
-SYSTEM = ['155_min']
+# SYSTEM = ['155_min']
 
 """
 OS platform
@@ -24,7 +24,7 @@ if platform == "win32":
     file = '1.mp4'
 elif platform == "linux" or platform == "linux2":
     api_preferences = None
-    path = '/home/aktumar/my_projects/video_UNT/'
+    path = '/home/aktumar/my_projects/Freelance/video_UNT/'
     file = '1.mp4'
 
 """
@@ -36,6 +36,26 @@ config.read(CONFIG_FILE)
 """
 Functions
 """
+
+
+def image_movement_detection(cap, frame1, frame2):
+    diff = cv2.absdiff(frame1, frame2)
+    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    _, thresh = cv2.threshold(blur, 20, 255, cv2.THRESH_BINARY)
+    dilated = cv2.dilate(thresh, None, iterations=3)
+
+    сontours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    for contour in сontours:
+        (x, y, w, h) = cv2.boundingRect(contour)
+        print(cv2.contourArea(contour))
+        if cv2.contourArea(contour) < 1000:
+            continue
+        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.putText(frame1, "Movement", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+
+    cv2.imshow("frame1", frame1)
 
 
 def image_contour_finder(frame):
@@ -114,20 +134,37 @@ Main function
 
 
 def file_open(file, sys, api_preferences):
-    cap = cv2.VideoCapture(file, api_preferences)
+    movement_detector = 1
+    contour_finder = None
+    delete_background = None
+    delete_background_upgrade = None
 
+    cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
-        print('Cannot open RTSP stream')
+        print('Cannot open file')
         exit(-1)
 
+    ret, frame1 = cap.read()
+    ret, frame2 = cap.read()
+
     while True:
-        _, frame = cap.read()
+        if movement_detector:
+            image_movement_detection(cap, frame1, frame2)
+            frame1 = frame2
+            ret, frame2 = cap.read()
+        if contour_finder:
+            _, frame = cap.read()
+            image_contour_finder(frame)
+            cv2.imshow(sys, frame)
+        if delete_background:
+            _, frame = cap.read()
+            image_delete_background(frame)
+            cv2.imshow(sys, frame)
+        if delete_background_upgrade:
+            _, frame = cap.read()
+            image_delete_background_upgrade(frame)
+            cv2.imshow(sys, frame)
 
-        image_contour_finder(frame)
-        # image_delete_background(frame)
-        # image_delete_background_upgrade(frame)
-
-        cv2.imshow(sys, frame)
 
         if cv2.waitKey(1) == 27:
             break
