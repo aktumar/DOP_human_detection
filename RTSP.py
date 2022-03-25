@@ -239,4 +239,3 @@ def argsParser():
 if __name__ == "__main__":
     args = argsParser()
     request_type(args)
-    
