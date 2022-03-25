@@ -73,7 +73,7 @@ def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
 
         # print(xl, yt, xr, ym)
 
-    if abs(ym - yt) * abs(xl - xr) > 10000:
+    if abs(ym - yt) * abs(xl - xr) > 20000:
         cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 0, 255), 2)
         cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
