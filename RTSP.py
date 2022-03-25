@@ -1,5 +1,6 @@
 import os
 import cv2
+import time
 import argparse
 import numpy as np
 import configparser
@@ -38,24 +39,46 @@ Functions
 """
 
 
-def image_movement_detection(cap, frame1, frame2):
+def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
     diff = cv2.absdiff(frame1, frame2)
+
+    res = diff.astype(np.uint8)
+    percentage = (np.count_nonzero(res) * 100) / res.size
+    if percentage > 30:
+        print("percentage = ", percentage)
+
     gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     _, thresh = cv2.threshold(blur, 20, 255, cv2.THRESH_BINARY)
     dilated = cv2.dilate(thresh, None, iterations=3)
 
-    сontours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    for contour in сontours:
+    contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    for contour in contours:
+        cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 255, 255), 2)
         (x, y, w, h) = cv2.boundingRect(contour)
-        print(cv2.contourArea(contour))
+        # print(x, y, w, h)
+        # print(cv2.contourArea(contour))
         if cv2.contourArea(contour) < 1000:
             continue
         cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        cv2.putText(frame1, "Movement", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+
+        if xl > x and abs(xl - xr) < 150:
+            xl = x
+        if yt > y and abs(yt - y) < 150:
+            yt = y
+        if xr < x + w and abs(xr - x + w) < 150:
+            xr = x + w
+        if ym < y + h and abs(ym - y + h) < 150:
+            ym = y + h
+
+        # print(xl, yt, xr, ym)
+
+    if abs(ym - yt) * abs(xl - xr) > 10000:
+        cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 0, 255), 2)
+        cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     cv2.imshow("frame1", frame1)
+    time.sleep(0.005)
 
 
 def image_contour_finder(frame):
@@ -147,9 +170,20 @@ def file_open(file, sys, api_preferences):
     ret, frame1 = cap.read()
     ret, frame2 = cap.read()
 
+    width = cap.get(3)
+    height = cap.get(4)
+
+    global xl, yt, xr, ym
+    xl = int(width / 2 - 20)
+    yt = int(height / 2 - 20)
+    xr = int(width / 2 + 20)
+    ym = int(height / 2 + 20)
+
+    print(xl, yt, xr, ym)
+
     while True:
         if movement_detector:
-            image_movement_detection(cap, frame1, frame2)
+            image_movement_detection(frame1, frame2, xl, yt, xr, ym)
             frame1 = frame2
             ret, frame2 = cap.read()
         if contour_finder:
@@ -164,7 +198,6 @@ def file_open(file, sys, api_preferences):
             _, frame = cap.read()
             image_delete_background_upgrade(frame)
             cv2.imshow(sys, frame)
-
 
         if cv2.waitKey(1) == 27:
             break
