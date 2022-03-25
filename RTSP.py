@@ -78,7 +78,7 @@ def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
         cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     cv2.imshow("frame1", frame1)
-    time.sleep(0.005)
+    time.sleep(0.01)
 
 
 def image_contour_finder(frame):
