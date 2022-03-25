@@ -17,3 +17,10 @@ python RTSP.py -u True
 python RTSP.py -v True
 ```
 
+
+
+------
+
+[References](https://github.com/aktumar/DOP_human_detection/blob/main/references.md)
+
+[Research](https://github.com/aktumar/DOP_human_detection/blob/main/research.md)
