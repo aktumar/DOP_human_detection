@@ -11,7 +11,7 @@ VARIABLES
 """
 global api_preferences
 CONFIG_FILE = "settings.ini"
-SYSTEM = ['151', '155', '157', '151_min', '155_min', '157_min']
+SYSTEM = ['151', '155', '157', '151_min', '155_min', '157_min', '1a', '2a', '3a']
 
 """
 OS platform
@@ -74,7 +74,7 @@ def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
         cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     cv2.imshow("frame1", frame1)
-    time.sleep(0.005)
+    # time.sleep(0.005)
 
 
 """
@@ -149,7 +149,7 @@ def request_type(args):
         port = config[sys]["PORT"]
         dir = config[sys]["DIR"]
         computer = config[sys]["COMPUTER"]
-        RTSP_URL = f'rtsp://{username}:{password}@{ip_address}:{port}/{dir}/Streaming/Channels/{computer}'
+        RTSP_URL = f'rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}'
         print(RTSP_URL)
         file_open(RTSP_URL, sys, api_preferences)
 
@@ -159,7 +159,8 @@ def argsParser():
     arg_parse.add_argument("-v", "--video", type=str, default=None,
                            help=f"Path to the local video file (select one video from default path \"{path}\"")
     arg_parse.add_argument("-u", "--url", type=str, default=None,
-                           help="URL address of RTSP (select one computer: 151, 155, 157, 151_min, 155_min, 157_min)")
+                           help="URL address of RTSP (select one computer: "
+                                "151, 155, 157, 151_min, 155_min, 157_min, 1a, 2a, 3a)")
     arg_parse.add_argument("-c", "--camera", type=str, default=None,
                            help="Local Camera (write ON/OFF to use/cancel camera)")
 
