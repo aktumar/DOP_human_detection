@@ -3,18 +3,18 @@
 To run program use following command:
 
 ```
-# Use your local camera
-python RTSP.py -c True
+# Use your local camera. Write ON to run camera
+python RTSP.py -c ON
 ```
 
 ```
-# Use RTSP with given .ini file
-python RTSP.py -u True
+# Use RTSP with given .ini file. Choose one computer(camera)
+python RTSP.py -u 151
 ```
 
 ```
-# Use local video path
-python RTSP.py -v True
+# Use local video path.
+python RTSP.py -v 1.mp4
 ```
 
 
