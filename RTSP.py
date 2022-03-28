@@ -35,7 +35,51 @@ Functions
 """
 
 
-def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
+class Rect:
+    def __init__(self, x, y, w, h):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+
+    def bottom_y(self):
+        return self.y + self.h
+
+    def right_x(self):
+        return self.x + self.w
+
+    def area(self):
+        return self.w * self.h
+
+    def center_x(self):
+        return self.x + self.w / 2
+
+    def center_y(self):
+        return self.y + self.h / 2
+
+    def print_coordinates(self):
+        print(self.x, self.y, self.x + self.w, self.y + self.h)
+
+    def union(self, b):
+        posX = min(self.x, b.x)
+        posY = min(self.y, b.y)
+
+        return Rect(posX, posY, max(self.right_x(), b.right_x()) - posX, max(self.bottom_y(), b.bottom_y()) - posY)
+
+    def intersection(self, b):
+        posX = max(self.x, b.x)
+        posY = max(self.y, b.y)
+
+        candidate = Rect(posX, posY, min(self.right_x(), b.right_x()) - posX, min(self.bottom_y(), b.bottom_y()) - posY)
+        if candidate.w > 0 and candidate.h > 0:
+            return candidate
+        return Rect(0, 0, 0, 0)
+
+    def ratio(self, b):
+        return self.intersection(b).area() / self.union(b).area()
+
+
+def image_movement_detection(frame1, frame2):
     diff = cv2.absdiff(frame1, frame2)
 
     res = diff.astype(np.uint8)
@@ -49,29 +93,34 @@ def image_movement_detection(frame1, frame2, xl, yt, xr, ym):
     dilated = cv2.dilate(thresh, None, iterations=3)
 
     contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    k = True
     for contour in contours:
-        cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 255, 255), 2)
+        # cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 255, 255), 2)
+        if k:
+            (x, y, w, h) = cv2.boundingRect(contour)
+            rec_old = Rect(x, y, w, h)
+            k = False
+
         (x, y, w, h) = cv2.boundingRect(contour)
-        # print(x, y, w, h)
-        # print(cv2.contourArea(contour))
+        rec = Rect(x, y, w, h)
+        rec.print_coordinates()
+        print("rec area", rec.area())
+        print()
+
         if cv2.contourArea(contour) < 1000:
             continue
-        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        if xl > x and abs(xl - xr) < 150:
-            xl = x
-        if yt > y and abs(yt - y) < 150:
-            yt = y
-        if xr < x + w and abs(xr - x + w) < 150:
-            xr = x + w
-        if ym < y + h and abs(ym - y + h) < 150:
-            ym = y + h
+        cv2.rectangle(frame1, (x, y), (rec.right_x(), rec.bottom_y()), (0, 255, 0), 2)
 
-        # print(xl, yt, xr, ym)
+        cv2.rectangle(frame1, (rec_old.union(rec).x, rec_old.union(rec).y),
+                      (rec_old.union(rec).right_x(), rec_old.union(rec).bottom_y()),
+                      (0, 255, 255), 2)
 
-    if abs(ym - yt) * abs(xl - xr) > 20000:
-        cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 0, 255), 2)
-        cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+        rec_old = rec
+
+    # if abs(ym - yt) * abs(xl - xr) > 20000:
+    #     cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 0, 255), 2)
+    #     cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
     cv2.imshow("frame1", frame1)
     # time.sleep(0.005)
@@ -99,17 +148,17 @@ def file_open(file, sys, api_preferences):
     width = cap.get(3)
     height = cap.get(4)
 
-    global xl, yt, xr, ym
-    xl = int(width / 2 - 20)
-    yt = int(height / 2 - 20)
-    xr = int(width / 2 + 20)
-    ym = int(height / 2 + 20)
-
-    print(xl, yt, xr, ym)
+    # global xl, yt, xr, ym
+    # xl = int(width / 2 - 20)
+    # yt = int(height / 2 - 20)
+    # xr = int(width / 2 + 20)
+    # ym = int(height / 2 + 20)
+    #
+    # print(xl, yt, xr, ym)
 
     while True:
         if movement_detector:
-            image_movement_detection(frame1, frame2, xl, yt, xr, ym)
+            image_movement_detection(frame1, frame2)
             frame1 = frame2
             ret, frame2 = cap.read()
         if contour_finder:
