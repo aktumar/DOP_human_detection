@@ -42,41 +42,30 @@ class Rect:
         self.w = w
         self.h = h
 
-    def bottom_y(self):
-        return self.y + self.h
 
-    def right_x(self):
-        return self.x + self.w
+def union(b_array):
+    posX = b_array[0].x
+    posY = b_array[0].y
+    posXR = b_array[0].x + b_array[0].w
+    posYB = b_array[0].y + b_array[0].h
 
-    def area(self):
-        return self.w * self.h
+    for i in range(1, len(b_array)):
+        # print(posX, posY, posXR, posYB)
+        if b_array[i].x < posX:
+            posX = b_array[i].x
+        if b_array[i].y < posY:
+            posY = b_array[i].y
+        if b_array[i].x + b_array[i].w > posXR:
+            posXR = b_array[i].x + b_array[i].w
+        if b_array[i].y + b_array[i].h > posYB:
+            posYB = b_array[i].y + b_array[i].h
 
-    def center_x(self):
-        return self.x + self.w / 2
+    posW = posXR - posX
+    posH = posYB - posY
 
-    def center_y(self):
-        return self.y + self.h / 2
+    print("len(b_array) = ", len(b_array))
 
-    def print_coordinates(self):
-        print(self.x, self.y, self.x + self.w, self.y + self.h)
-
-    def union(self, b):
-        posX = min(self.x, b.x)
-        posY = min(self.y, b.y)
-
-        return Rect(posX, posY, max(self.right_x(), b.right_x()) - posX, max(self.bottom_y(), b.bottom_y()) - posY)
-
-    def intersection(self, b):
-        posX = max(self.x, b.x)
-        posY = max(self.y, b.y)
-
-        candidate = Rect(posX, posY, min(self.right_x(), b.right_x()) - posX, min(self.bottom_y(), b.bottom_y()) - posY)
-        if candidate.w > 0 and candidate.h > 0:
-            return candidate
-        return Rect(0, 0, 0, 0)
-
-    def ratio(self, b):
-        return self.intersection(b).area() / self.union(b).area()
+    return Rect(posX, posY, posW, posH)
 
 
 def image_movement_detection(frame1, frame2):
@@ -92,38 +81,27 @@ def image_movement_detection(frame1, frame2):
     _, thresh = cv2.threshold(blur, 20, 255, cv2.THRESH_BINARY)
     dilated = cv2.dilate(thresh, None, iterations=3)
 
+    rec_array = []
     contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    k = True
     for contour in contours:
-        # cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 255, 255), 2)
-        if k:
-            (x, y, w, h) = cv2.boundingRect(contour)
-            rec_old = Rect(x, y, w, h)
-            k = False
 
         (x, y, w, h) = cv2.boundingRect(contour)
-        rec = Rect(x, y, w, h)
-        rec.print_coordinates()
-        print("rec area", rec.area())
-        print()
-
         if cv2.contourArea(contour) < 1000:
             continue
+        print(x, y, x + w, y + h)
+        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        rec_array.append(Rect(x, y, w, h))
 
-        cv2.rectangle(frame1, (x, y), (rec.right_x(), rec.bottom_y()), (0, 255, 0), 2)
-
-        cv2.rectangle(frame1, (rec_old.union(rec).x, rec_old.union(rec).y),
-                      (rec_old.union(rec).right_x(), rec_old.union(rec).bottom_y()),
-                      (0, 255, 255), 2)
-
-        rec_old = rec
-
-    # if abs(ym - yt) * abs(xl - xr) > 20000:
-    #     cv2.rectangle(frame1, (xl, yt), (xr, ym), (0, 0, 255), 2)
-    #     cv2.putText(frame1, "Movement", (30, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+    if rec_array:
+        rec_uni = union(rec_array)
+        print("result = ", rec_uni.x, rec_uni.y, rec_uni.x + rec_uni.w, rec_uni.y + rec_uni.h)
+        print()
+        print()
+        print()
+        cv2.rectangle(frame1, (rec_uni.x, rec_uni.y), (rec_uni.x + rec_uni.w, rec_uni.y + rec_uni.h), (0, 0, 255), 2)
 
     cv2.imshow("frame1", frame1)
-    # time.sleep(0.005)
+    # time.sleep(1)
 
 
 """
@@ -148,6 +126,8 @@ def file_open(file, sys, api_preferences):
     width = cap.get(3)
     height = cap.get(4)
 
+    print("-------------", width, height)
+
     # global xl, yt, xr, ym
     # xl = int(width / 2 - 20)
     # yt = int(height / 2 - 20)
@@ -161,18 +141,6 @@ def file_open(file, sys, api_preferences):
             image_movement_detection(frame1, frame2)
             frame1 = frame2
             ret, frame2 = cap.read()
-        if contour_finder:
-            _, frame = cap.read()
-            image_contour_finder(frame)
-            cv2.imshow(sys, frame)
-        if delete_background:
-            _, frame = cap.read()
-            image_delete_background(frame)
-            cv2.imshow(sys, frame)
-        if delete_background_upgrade:
-            _, frame = cap.read()
-            image_delete_background_upgrade(frame)
-            cv2.imshow(sys, frame)
 
         if cv2.waitKey(1) == 27:
             break
