@@ -43,7 +43,7 @@ class Rect:
         self.h = h
 
 
-def union(b_array):
+def rectangles_union(b_array):
     posX = b_array[0].x
     posY = b_array[0].y
     posXR = b_array[0].x + b_array[0].w
@@ -63,12 +63,50 @@ def union(b_array):
     posW = posXR - posX
     posH = posYB - posY
 
-    print("len(b_array) = ", len(b_array))
+    # print("len(b_array) = ", len(b_array))
 
     return Rect(posX, posY, posW, posH)
 
 
-def image_movement_detection(frame1, frame2):
+def points_clustering(b_array):
+    b_unions = []
+
+    if len(b_array) <= 1:
+        return b_array
+
+    for i in range(1, len(b_array)):
+        if b_array[0].x - b_array[i].x < 150 and b_array[0].y - b_array[i].y < 150:
+            rectangles_clustering(b_array.pop(0))
+            b_unions.append(b_array[0])
+
+
+def rectangles_clustering(b_array):
+    result = []
+    b_unions = []
+
+    while b_array:
+        points_clustering(b_array)
+
+    if len(b_array) <= 1:
+        result.append(b_array)
+        return result
+
+    for i in range(1, len(b_array)):
+        if b_array[0].x - b_array[i].x < 150 and b_array[0].y - b_array[i].y < 150:
+            # print("b_array con", b_array[0].x, b_array[i].x)
+            points_clustering(b_array.pop(0))
+            b_unions.append(b_array[0])
+        u = rectangles_union(b_unions)
+        print("u = ", u)
+
+        result.append(u)
+
+    print("result = ", result)
+
+    return result
+
+
+def movement_detection(frame1, frame2):
     diff = cv2.absdiff(frame1, frame2)
 
     res = diff.astype(np.uint8)
@@ -89,16 +127,22 @@ def image_movement_detection(frame1, frame2):
         if cv2.contourArea(contour) < 1000:
             continue
         print(x, y, x + w, y + h)
-        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     if rec_array:
-        rec_uni = union(rec_array)
-        print("result = ", rec_uni.x, rec_uni.y, rec_uni.x + rec_uni.w, rec_uni.y + rec_uni.h)
-        print()
-        print()
-        print()
-        cv2.rectangle(frame1, (rec_uni.x, rec_uni.y), (rec_uni.x + rec_uni.w, rec_uni.y + rec_uni.h), (0, 0, 255), 2)
+        rec_cluster = rectangles_clustering(rec_array)
+
+        for r in rec_cluster:
+            print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+            cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+
+    print()
+    print()
+    print()
+    print()
+    print()
+    print()
 
     cv2.imshow("frame1", frame1)
     # time.sleep(1)
@@ -111,9 +155,6 @@ Main function
 
 def file_open(file, sys, api_preferences):
     movement_detector = 1
-    contour_finder = None
-    delete_background = None
-    delete_background_upgrade = None
 
     cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
@@ -123,22 +164,9 @@ def file_open(file, sys, api_preferences):
     ret, frame1 = cap.read()
     ret, frame2 = cap.read()
 
-    width = cap.get(3)
-    height = cap.get(4)
-
-    print("-------------", width, height)
-
-    # global xl, yt, xr, ym
-    # xl = int(width / 2 - 20)
-    # yt = int(height / 2 - 20)
-    # xr = int(width / 2 + 20)
-    # ym = int(height / 2 + 20)
-    #
-    # print(xl, yt, xr, ym)
-
     while True:
         if movement_detector:
-            image_movement_detection(frame1, frame2)
+            movement_detection(frame1, frame2)
             frame1 = frame2
             ret, frame2 = cap.read()
 
@@ -158,7 +186,6 @@ def request_type(args):
         file_open(path + args['video'], args['video'], None)
     elif args['url'] is not None and args['url'] in SYSTEM:
         print('[INFO] Opening URL of Real-Time Streaming Protocol.')
-        # for sys in SYSTEM:
         sys = args['url']
         username = config[sys]["USERNAME"]
         password = config[sys]["PASSWORD"]
