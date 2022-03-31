@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import configparser
 from sys import platform
+from collections import deque
 
 """
 VARIABLES
@@ -68,42 +69,56 @@ def rectangles_union(b_array):
     return Rect(posX, posY, posW, posH)
 
 
-def points_clustering(b_array):
-    b_unions = []
-
-    if len(b_array) <= 1:
-        return b_array
-
-    for i in range(1, len(b_array)):
-        if b_array[0].x - b_array[i].x < 150 and b_array[0].y - b_array[i].y < 150:
-            rectangles_clustering(b_array.pop(0))
-            b_unions.append(b_array[0])
-
-
 def rectangles_clustering(b_array):
-    result = []
     b_unions = []
+    rec_unions = []
+    q = deque()
 
     while b_array:
-        points_clustering(b_array)
+        print("q = ", q)
+        print("b_unions = ", b_unions)
+        print("rec_unions = ", rec_unions)
+        if q:
+            print("Second")
+            element = q.popleft()
+            b_unions.append(element)
+            print("b_unions = ", b_unions)
+            print("rec_unions = ", rec_unions)
+            print("q = ", q)
+            print("element = ", element.x, element.y)
+            for i in range(len(b_array) - 1):
+                if abs(element.x - b_array[i].x) <= 20 and abs(element.y - b_array[i].y) <= 20:
+                    print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
+                    q.append(b_array[i])
+                    print("q = ", q)
+            print()
+            print()
 
-    if len(b_array) <= 1:
-        result.append(b_array)
-        return result
+        else:
+            print("First")
+            if b_unions:
+                print("Third, unions = ", len(b_unions))
+                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).w,
+                      rectangles_union(b_unions).h)
+                rec_unions.append(rectangles_union(b_unions))
+                b_unions.clear()
+            element = b_array.pop(0)
+            b_unions.append(element)
+            print("rec_unions = ", rec_unions)
+            print("b_unions = ", b_unions)
+            print("rec_unions = ", rec_unions)
+            print("q = ", q)
+            print("element = ", element.x, element.y)
+            for i in range(len(b_array) - 1):
+                if abs(element.x - b_array[i].x) <= 20 and abs(element.y - b_array[i].y) <= 20:
+                    print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
+                    q.append(b_array[i])
+                    print("q = ", q)
+                    b_array.pop(i)
+            print()
+            print()
 
-    for i in range(1, len(b_array)):
-        if b_array[0].x - b_array[i].x < 150 and b_array[0].y - b_array[i].y < 150:
-            # print("b_array con", b_array[0].x, b_array[i].x)
-            points_clustering(b_array.pop(0))
-            b_unions.append(b_array[0])
-        u = rectangles_union(b_unions)
-        print("u = ", u)
-
-        result.append(u)
-
-    print("result = ", result)
-
-    return result
+    return rec_unions
 
 
 def movement_detection(frame1, frame2):
@@ -122,20 +137,39 @@ def movement_detection(frame1, frame2):
     rec_array = []
     contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours:
-
         (x, y, w, h) = cv2.boundingRect(contour)
         if cv2.contourArea(contour) < 1000:
             continue
         print(x, y, x + w, y + h)
-        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        rec_array.append(Rect(x, y, w, h))
+        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # rec_array.append(Rect(x, y, w, h))
 
-    if rec_array:
-        rec_cluster = rectangles_clustering(rec_array)
+    # if rec_array:
+    #     rec_cluster = rectangles_clustering(rec_array)
+    #     for r in rec_cluster:
+    #         print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+    #         cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
-        for r in rec_cluster:
-            print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-            cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+    rec_array.append(Rect(10, 10, 10, 10))
+    rec_array.append(Rect(70, 10, 10, 10))
+    rec_array.append(Rect(20, 20, 10, 10))
+    rec_array.append(Rect(90, 20, 10, 10))
+    rec_array.append(Rect(60, 40, 10, 10))
+    rec_array.append(Rect(10, 50, 10, 10))
+    rec_array.append(Rect(40, 50, 10, 10))
+    rec_array.append(Rect(70, 50, 10, 10))
+    rec_array.append(Rect(40, 60, 10, 10))
+    rec_array.append(Rect(60, 70, 10, 10))
+
+    for i in range(len(rec_array)):
+        print("points = ", rec_array[i].x, rec_array[i].y)
+
+    rec_cluster = rectangles_clustering(rec_array)
+    for r in range(len(rec_cluster)):
+        print("result[", r, "] = ", rec_cluster[r].x, rec_cluster[r].y, rec_cluster[r].x + rec_cluster[r].w,
+              rec_cluster[r].y + rec_cluster[r].h)
+        cv2.rectangle(frame1, (rec_cluster[r].x, rec_cluster[r].y),
+                      (rec_cluster[r].x + rec_cluster[r].w, rec_cluster[r].y + rec_cluster[r].h), (0, 0, 255), 2)
 
     print()
     print()
@@ -154,8 +188,6 @@ Main function
 
 
 def file_open(file, sys, api_preferences):
-    movement_detector = 1
-
     cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
         print('Cannot open file')
@@ -165,10 +197,9 @@ def file_open(file, sys, api_preferences):
     ret, frame2 = cap.read()
 
     while True:
-        if movement_detector:
-            movement_detection(frame1, frame2)
-            frame1 = frame2
-            ret, frame2 = cap.read()
+        movement_detection(frame1, frame2)
+        frame1 = frame2
+        ret, frame2 = cap.read()
 
         if cv2.waitKey(1) == 27:
             break
