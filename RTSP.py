@@ -75,46 +75,51 @@ def rectangles_clustering(b_array):
     q = deque()
 
     while b_array:
-        print("q = ", q)
-        print("b_unions = ", b_unions)
-        print("rec_unions = ", rec_unions)
         if q:
             print("Second")
+            print("len(b_array) = ", len(b_array))
             element = q.popleft()
-            b_unions.append(element)
-            print("b_unions = ", b_unions)
-            print("rec_unions = ", rec_unions)
-            print("q = ", q)
             print("element = ", element.x, element.y)
-            for i in range(len(b_array) - 1):
-                if abs(element.x - b_array[i].x) <= 20 and abs(element.y - b_array[i].y) <= 20:
-                    print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
+            b_unions.append(element)
+            for i in range(len(b_array)):
+                print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
+                if abs(element.x - b_array[i].x) <= 200 and abs(element.y - b_array[i].y) <= 200:
+                    print("OK")
                     q.append(b_array[i])
-                    print("q = ", q)
+                    b_array[i] = None
+            b_array[:] = (value for value in b_array if value is not None)
             print()
             print()
 
         else:
             print("First")
+            print("len(b_array) = ", len(b_array))
             if b_unions:
                 print("Third, unions = ", len(b_unions))
-                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).w,
-                      rectangles_union(b_unions).h)
+                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
+                      rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
                 rec_unions.append(rectangles_union(b_unions))
                 b_unions.clear()
+                print()
+                print()
+
             element = b_array.pop(0)
-            b_unions.append(element)
-            print("rec_unions = ", rec_unions)
-            print("b_unions = ", b_unions)
-            print("rec_unions = ", rec_unions)
-            print("q = ", q)
+
+            if not b_array:
+                print("Last one = ")
+                rec_unions.append(element)
+                break
+
             print("element = ", element.x, element.y)
-            for i in range(len(b_array) - 1):
-                if abs(element.x - b_array[i].x) <= 20 and abs(element.y - b_array[i].y) <= 20:
-                    print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
+            b_unions.append(element)
+
+            for i in range(len(b_array)):
+                print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
+                if abs(element.x - b_array[i].x) <= 200 and abs(element.y - b_array[i].y) <= 200:
+                    print("OK")
                     q.append(b_array[i])
-                    print("q = ", q)
-                    b_array.pop(i)
+                    b_array[i] = None
+            b_array[:] = (value for value in b_array if value is not None)
             print()
             print()
 
@@ -142,34 +147,34 @@ def movement_detection(frame1, frame2):
             continue
         print(x, y, x + w, y + h)
         # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        # rec_array.append(Rect(x, y, w, h))
+        rec_array.append(Rect(x, y, w, h))
 
-    # if rec_array:
-    #     rec_cluster = rectangles_clustering(rec_array)
-    #     for r in rec_cluster:
-    #         print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-    #         cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+    if rec_array:
+        rec_cluster = rectangles_clustering(rec_array)
+        for r in rec_cluster:
+            print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+            # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
-    rec_array.append(Rect(10, 10, 10, 10))
-    rec_array.append(Rect(70, 10, 10, 10))
-    rec_array.append(Rect(20, 20, 10, 10))
-    rec_array.append(Rect(90, 20, 10, 10))
-    rec_array.append(Rect(60, 40, 10, 10))
-    rec_array.append(Rect(10, 50, 10, 10))
-    rec_array.append(Rect(40, 50, 10, 10))
-    rec_array.append(Rect(70, 50, 10, 10))
-    rec_array.append(Rect(40, 60, 10, 10))
-    rec_array.append(Rect(60, 70, 10, 10))
-
+    cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
+    rec_array.append(Rect(100, 100, 100, 100))
+    rec_array.append(Rect(700, 100, 100, 100))
+    rec_array.append(Rect(200, 200, 100, 100))
+    rec_array.append(Rect(900, 200, 100, 100))
+    rec_array.append(Rect(600, 400, 100, 100))
+    rec_array.append(Rect(100, 500, 100, 100))
+    rec_array.append(Rect(400, 500, 100, 100))
+    rec_array.append(Rect(700, 500, 100, 100))
+    rec_array.append(Rect(400, 600, 100, 100))
+    rec_array.append(Rect(600, 700, 100, 100))
     for i in range(len(rec_array)):
         print("points = ", rec_array[i].x, rec_array[i].y)
+        cv2.rectangle(frame1, (rec_array[i].x, rec_array[i].y),
+                      (rec_array[i].x + rec_array[i].w, rec_array[i].y + rec_array[i].h), (0, 255, 0), 2)
 
     rec_cluster = rectangles_clustering(rec_array)
-    for r in range(len(rec_cluster)):
-        print("result[", r, "] = ", rec_cluster[r].x, rec_cluster[r].y, rec_cluster[r].x + rec_cluster[r].w,
-              rec_cluster[r].y + rec_cluster[r].h)
-        cv2.rectangle(frame1, (rec_cluster[r].x, rec_cluster[r].y),
-                      (rec_cluster[r].x + rec_cluster[r].w, rec_cluster[r].y + rec_cluster[r].h), (0, 0, 255), 2)
+    for r in rec_cluster:
+        print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+        cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
     print()
     print()
