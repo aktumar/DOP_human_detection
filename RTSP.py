@@ -69,6 +69,56 @@ def rectangles_union(b_array):
     return Rect(posX, posY, posW, posH)
 
 
+def rectangle_nearest(e, b):
+    exl = e.x
+    exr = e.x + e.w
+    eyt = e.y
+    eyb = e.y + e.h
+
+    bxl = b.x
+    bxr = b.x + b.w
+    byt = b.y
+    byb = b.y + b.h
+
+    if abs(exl - bxl) <= 200 and abs(eyt - byt) <= 200:
+        return True
+    if abs(exl - bxl) <= 200 and abs(eyt - byb) <= 200:
+        return True
+    if abs(exl - bxr) <= 200 and abs(eyt - byt) <= 200:
+        return True
+    if abs(exl - bxr) <= 200 and abs(eyt - byb) <= 200:
+        return True
+
+    if abs(exl - bxl) <= 200 and abs(eyb - byt) <= 200:
+        return True
+    if abs(exl - bxl) <= 200 and abs(eyb - byb) <= 200:
+        return True
+    if abs(exl - bxr) <= 200 and abs(eyb - byt) <= 200:
+        return True
+    if abs(exl - bxr) <= 200 and abs(eyb - byb) <= 200:
+        return True
+
+    if abs(exr - bxl) <= 200 and abs(eyt - byt) <= 200:
+        return True
+    if abs(exr - bxl) <= 200 and abs(eyt - byb) <= 200:
+        return True
+    if abs(exr - bxr) <= 200 and abs(eyt - byt) <= 200:
+        return True
+    if abs(exr - bxr) <= 200 and abs(eyt - byb) <= 200:
+        return True
+
+    if abs(exr - bxl) <= 200 and abs(eyb - byt) <= 200:
+        return True
+    if abs(exr - bxl) <= 200 and abs(eyb - byb) <= 200:
+        return True
+    if abs(exr - bxr) <= 200 and abs(eyb - byt) <= 200:
+        return True
+    if abs(exr - bxr) <= 200 and abs(eyb - byb) <= 200:
+        return True
+
+    return False
+
+
 def rectangles_clustering(b_array):
     b_unions = []
     rec_unions = []
@@ -84,7 +134,7 @@ def rectangles_clustering(b_array):
 
             for i in range(len(b_array)):
                 print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
-                if abs(element.x - b_array[i].x) <= 200 and abs(element.y - b_array[i].y) <= 200:
+                if rectangle_nearest(element, b_array[i]):
                     print("OK")
                     q.append(b_array[i])
                     b_array[i] = None
@@ -116,7 +166,7 @@ def rectangles_clustering(b_array):
 
             for i in range(len(b_array)):
                 print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
-                if abs(element.x - b_array[i].x) <= 200 and abs(element.y - b_array[i].y) <= 200:
+                if rectangle_nearest(element, b_array[i]):
                     print("OK")
                     q.append(b_array[i])
                     b_array[i] = None
@@ -156,7 +206,7 @@ def movement_detection(frame1, frame2):
         if cv2.contourArea(contour) < 1000:
             continue
         print(x, y, x + w, y + h)
-        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     if rec_array:
@@ -166,18 +216,18 @@ def movement_detection(frame1, frame2):
             cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
     # cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
-    # rec_array.append(Rect(900, 200, 100, 100))
+    # # rec_array.append(Rect(900, 200, 100, 100))
     # rec_array.append(Rect(700, 500, 100, 100))
-    # rec_array.append(Rect(400, 600, 100, 100))
+    # # rec_array.append(Rect(400, 600, 100, 100))
     # rec_array.append(Rect(600, 700, 100, 100))
     # rec_array.append(Rect(100, 500, 100, 100))
     # rec_array.append(Rect(600, 400, 100, 100))
-    # rec_array.append(Rect(400, 500, 100, 100))
+    # # rec_array.append(Rect(400, 500, 100, 100))
     # rec_array.append(Rect(100, 100, 100, 100))
     # rec_array.append(Rect(700, 100, 100, 100))
-    # rec_array.append(Rect(200, 200, 100, 100))
-    # rec_array.append(Rect(300, 300, 100, 100))
-
+    # # rec_array.append(Rect(200, 200, 100, 100))
+    # # rec_array.append(Rect(300, 300, 100, 100))
+    #
     # for i in range(len(rec_array)):
     #     print("points = ", rec_array[i].x, rec_array[i].y)
     #     cv2.rectangle(frame1, (rec_array[i].x, rec_array[i].y),
