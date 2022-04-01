@@ -81,6 +81,7 @@ def rectangles_clustering(b_array):
             element = q.popleft()
             print("element = ", element.x, element.y)
             b_unions.append(element)
+
             for i in range(len(b_array)):
                 print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
                 if abs(element.x - b_array[i].x) <= 200 and abs(element.y - b_array[i].y) <= 200:
@@ -88,6 +89,7 @@ def rectangles_clustering(b_array):
                     q.append(b_array[i])
                     b_array[i] = None
             b_array[:] = (value for value in b_array if value is not None)
+
             print()
             print()
 
@@ -104,7 +106,6 @@ def rectangles_clustering(b_array):
                 print()
 
             element = b_array.pop(0)
-
             if not b_array:
                 print("Last one = ")
                 rec_unions.append(element)
@@ -120,6 +121,15 @@ def rectangles_clustering(b_array):
                     q.append(b_array[i])
                     b_array[i] = None
             b_array[:] = (value for value in b_array if value is not None)
+
+            if not b_array:
+                print("All, unions = ", len(b_unions))
+                while q:
+                    b_unions.append(q.popleft())
+                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
+                      rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
+                rec_unions.append(rectangles_union(b_unions))
+
             print()
             print()
 
@@ -146,35 +156,37 @@ def movement_detection(frame1, frame2):
         if cv2.contourArea(contour) < 1000:
             continue
         print(x, y, x + w, y + h)
-        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     if rec_array:
         rec_cluster = rectangles_clustering(rec_array)
         for r in rec_cluster:
             print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-            # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+            cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
-    cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
-    rec_array.append(Rect(100, 100, 100, 100))
-    rec_array.append(Rect(700, 100, 100, 100))
-    rec_array.append(Rect(200, 200, 100, 100))
-    rec_array.append(Rect(900, 200, 100, 100))
-    rec_array.append(Rect(600, 400, 100, 100))
-    rec_array.append(Rect(100, 500, 100, 100))
-    rec_array.append(Rect(400, 500, 100, 100))
-    rec_array.append(Rect(700, 500, 100, 100))
-    rec_array.append(Rect(400, 600, 100, 100))
-    rec_array.append(Rect(600, 700, 100, 100))
-    for i in range(len(rec_array)):
-        print("points = ", rec_array[i].x, rec_array[i].y)
-        cv2.rectangle(frame1, (rec_array[i].x, rec_array[i].y),
-                      (rec_array[i].x + rec_array[i].w, rec_array[i].y + rec_array[i].h), (0, 255, 0), 2)
+    # cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
+    # rec_array.append(Rect(900, 200, 100, 100))
+    # rec_array.append(Rect(700, 500, 100, 100))
+    # rec_array.append(Rect(400, 600, 100, 100))
+    # rec_array.append(Rect(600, 700, 100, 100))
+    # rec_array.append(Rect(100, 500, 100, 100))
+    # rec_array.append(Rect(600, 400, 100, 100))
+    # rec_array.append(Rect(400, 500, 100, 100))
+    # rec_array.append(Rect(100, 100, 100, 100))
+    # rec_array.append(Rect(700, 100, 100, 100))
+    # rec_array.append(Rect(200, 200, 100, 100))
+    # rec_array.append(Rect(300, 300, 100, 100))
 
-    rec_cluster = rectangles_clustering(rec_array)
-    for r in rec_cluster:
-        print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-        cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+    # for i in range(len(rec_array)):
+    #     print("points = ", rec_array[i].x, rec_array[i].y)
+    #     cv2.rectangle(frame1, (rec_array[i].x, rec_array[i].y),
+    #                   (rec_array[i].x + rec_array[i].w, rec_array[i].y + rec_array[i].h), (0, 255, 0), 2)
+    #
+    # rec_cluster = rectangles_clustering(rec_array)
+    # for r in rec_cluster:
+    #     print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+    #     cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
     print()
     print()
