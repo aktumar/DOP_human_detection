@@ -122,13 +122,13 @@ def rectangles_clustering(b_array):
                     b_array[i] = None
             b_array[:] = (value for value in b_array if value is not None)
 
-            if not b_array:
-                print("All, unions = ", len(b_unions))
-                while q:
-                    b_unions.append(q.popleft())
-                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
-                      rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
-                rec_unions.append(rectangles_union(b_unions))
+        if not b_array:
+            print("All, unions = ", len(b_unions))
+            while q:
+                b_unions.append(q.popleft())
+            print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
+                  rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
+            rec_unions.append(rectangles_union(b_unions))
 
             print()
             print()
