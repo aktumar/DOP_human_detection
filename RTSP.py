@@ -1,6 +1,7 @@
 import os
 import cv2
 import time
+import math
 import argparse
 import numpy as np
 import configparser
@@ -69,7 +70,7 @@ def rectangles_union(b_array):
     return Rect(posX, posY, posW, posH)
 
 
-def rectangle_nearest(e, b):
+def rectangle_nearest(e, b, dist):
     exl = e.x
     exr = e.x + e.w
     eyt = e.y
@@ -80,119 +81,99 @@ def rectangle_nearest(e, b):
     byt = b.y
     byb = b.y + b.h
 
-    if abs(exl - bxl) <= 200 and abs(eyt - byt) <= 200:
-        return True
-    if abs(exl - bxl) <= 200 and abs(eyt - byb) <= 200:
-        return True
-    if abs(exl - bxr) <= 200 and abs(eyt - byt) <= 200:
-        return True
-    if abs(exl - bxr) <= 200 and abs(eyt - byb) <= 200:
-        return True
+    cont = False
 
-    if abs(exl - bxl) <= 200 and abs(eyb - byt) <= 200:
-        return True
-    if abs(exl - bxl) <= 200 and abs(eyb - byb) <= 200:
-        return True
-    if abs(exl - bxr) <= 200 and abs(eyb - byt) <= 200:
-        return True
-    if abs(exl - bxr) <= 200 and abs(eyb - byb) <= 200:
-        return True
+    if abs(exl - bxl) <= dist:
+        cont = True
+    if abs(exl - bxr) <= dist:
+        cont = True
+    if abs(exr - bxl) <= dist:
+        cont = True
+    if abs(exr - bxr) <= dist:
+        cont = True
 
-    if abs(exr - bxl) <= 200 and abs(eyt - byt) <= 200:
-        return True
-    if abs(exr - bxl) <= 200 and abs(eyt - byb) <= 200:
-        return True
-    if abs(exr - bxr) <= 200 and abs(eyt - byt) <= 200:
-        return True
-    if abs(exr - bxr) <= 200 and abs(eyt - byb) <= 200:
-        return True
-
-    if abs(exr - bxl) <= 200 and abs(eyb - byt) <= 200:
-        return True
-    if abs(exr - bxl) <= 200 and abs(eyb - byb) <= 200:
-        return True
-    if abs(exr - bxr) <= 200 and abs(eyb - byt) <= 200:
-        return True
-    if abs(exr - bxr) <= 200 and abs(eyb - byb) <= 200:
-        return True
+    if cont:
+        if abs(eyt - byt) <= dist:
+            return True
+        if abs(eyt - byb) <= dist:
+            return True
+        if abs(eyb - byt) <= dist:
+            return True
+        if abs(eyb - byb) <= dist:
+            return True
 
     return False
 
 
-def rectangles_clustering(b_array):
+def rectangles_clustering(b_array, distance):
     b_unions = []
     rec_unions = []
     q = deque()
 
     while b_array:
         if q:
-            print("Second")
-            print("len(b_array) = ", len(b_array))
+            # print("Second")
             element = q.popleft()
-            print("element = ", element.x, element.y)
+            # print("element = ", element.x, element.y)
             b_unions.append(element)
 
             for i in range(len(b_array)):
-                print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
-                if rectangle_nearest(element, b_array[i]):
-                    print("OK")
+                # print(f"b_array[{i}] = ", b_array[i].x, b_array[i].y)
+                if rectangle_nearest(element, b_array[i], distance):
+                    # print("OK")
                     q.append(b_array[i])
                     b_array[i] = None
             b_array[:] = (value for value in b_array if value is not None)
+            # print()
 
-            print()
-            print()
 
         else:
-            print("First")
-            print("len(b_array) = ", len(b_array))
+            # print("First")
             if b_unions:
-                print("Third, unions = ", len(b_unions))
-                print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
-                      rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
+                # print("Third, unions = ", len(b_unions))
+                # print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
+                #       rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
                 rec_unions.append(rectangles_union(b_unions))
                 b_unions.clear()
-                print()
-                print()
+                # print()
 
             element = b_array.pop(0)
             if not b_array:
-                print("Last one = ")
+                # print("Last one = ")
                 rec_unions.append(element)
                 break
 
-            print("element = ", element.x, element.y)
+            # print("element = ", element.x, element.y)
             b_unions.append(element)
 
             for i in range(len(b_array)):
-                print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
-                if rectangle_nearest(element, b_array[i]):
-                    print("OK")
+                # print("b_array[", i, "] = ", b_array[i].x, b_array[i].y)
+                if rectangle_nearest(element, b_array[i], distance):
+                    # print("OK")
                     q.append(b_array[i])
                     b_array[i] = None
             b_array[:] = (value for value in b_array if value is not None)
 
         if not b_array:
-            print("All, unions = ", len(b_unions))
+            # print("All, unions = ", len(b_unions))
             while q:
                 b_unions.append(q.popleft())
-            print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
-                  rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
+            # print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
+            #       rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
             rec_unions.append(rectangles_union(b_unions))
-
-            print()
-            print()
+            # print()
 
     return rec_unions
 
 
-def movement_detection(frame1, frame2):
+def movement_detection(frame1, frame2, distance):
     diff = cv2.absdiff(frame1, frame2)
 
     res = diff.astype(np.uint8)
     percentage = (np.count_nonzero(res) * 100) / res.size
     if percentage > 30:
-        print("percentage = ", percentage)
+        # print("percentage = ", percentage)
+        pass
 
     gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -205,26 +186,30 @@ def movement_detection(frame1, frame2):
         (x, y, w, h) = cv2.boundingRect(contour)
         if cv2.contourArea(contour) < 1000:
             continue
-        print(x, y, x + w, y + h)
+        # print(x, y, x + w, y + h)
         # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     if rec_array:
-        rec_cluster = rectangles_clustering(rec_array)
+        rec_cluster = rectangles_clustering(rec_array, distance)
+        max_rec = rec_cluster[0]
         for r in rec_cluster:
-            print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-            cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+            # print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
+            # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+            if max_rec.w * max_rec.h < r.w * r.h:
+                max_rec = r
+        cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
     # cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
-    # # rec_array.append(Rect(900, 200, 100, 100))
+    # rec_array.append(Rect(900, 200, 100, 100))
     # rec_array.append(Rect(700, 500, 100, 100))
     # # rec_array.append(Rect(400, 600, 100, 100))
-    # rec_array.append(Rect(600, 700, 100, 100))
+    # # rec_array.append(Rect(600, 700, 100, 100))
     # rec_array.append(Rect(100, 500, 100, 100))
-    # rec_array.append(Rect(600, 400, 100, 100))
+    # # rec_array.append(Rect(600, 400, 100, 100))
     # # rec_array.append(Rect(400, 500, 100, 100))
     # rec_array.append(Rect(100, 100, 100, 100))
-    # rec_array.append(Rect(700, 100, 100, 100))
+    # # rec_array.append(Rect(700, 100, 100, 100))
     # # rec_array.append(Rect(200, 200, 100, 100))
     # # rec_array.append(Rect(300, 300, 100, 100))
     #
@@ -238,12 +223,7 @@ def movement_detection(frame1, frame2):
     #     print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
     #     cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
-    print()
-    print()
-    print()
-    print()
-    print()
-    print()
+    # print()
 
     cv2.imshow("frame1", frame1)
     # time.sleep(1)
@@ -263,8 +243,14 @@ def file_open(file, sys, api_preferences):
     ret, frame1 = cap.read()
     ret, frame2 = cap.read()
 
+    print("width = ", frame1.shape[1])
+    print("height = ", frame1.shape[0])
+
+    distance = math.sqrt(frame1.shape[0] * frame1.shape[1] * 0.05)
+    print("distance = ", distance)
+
     while True:
-        movement_detection(frame1, frame2)
+        movement_detection(frame1, frame2, distance)
         frame1 = frame2
         ret, frame2 = cap.read()
 
