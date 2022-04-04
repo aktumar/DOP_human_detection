@@ -191,7 +191,7 @@ def movement_detection(frame1, frame2, area, rec_glob):
         if cv2.contourArea(contour) < area * 0.01:
             continue
         # print(x, y, x + w, y + h)
-        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     if rec_array:
@@ -204,29 +204,6 @@ def movement_detection(frame1, frame2, area, rec_glob):
                 max_rec = r
         cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
         rec_glob = rectangles_global(max_rec, rec_glob)
-
-    # cv2.rectangle(frame1, (0, 0), (1000, 1000), (0, 0, 0), 1000)
-    # rec_array.append(Rect(900, 200, 100, 100))
-    # rec_array.append(Rect(700, 500, 100, 100))
-    # # rec_array.append(Rect(400, 600, 100, 100))
-    # # rec_array.append(Rect(600, 700, 100, 100))
-    # rec_array.append(Rect(100, 500, 100, 100))
-    # # rec_array.append(Rect(600, 400, 100, 100))
-    # # rec_array.append(Rect(400, 500, 100, 100))
-    # rec_array.append(Rect(100, 100, 100, 100))
-    # # rec_array.append(Rect(700, 100, 100, 100))
-    # # rec_array.append(Rect(200, 200, 100, 100))
-    # # rec_array.append(Rect(300, 300, 100, 100))
-    #
-    # for i in range(len(rec_array)):
-    #     print("points = ", rec_array[i].x, rec_array[i].y)
-    #     cv2.rectangle(frame1, (rec_array[i].x, rec_array[i].y),
-    #                   (rec_array[i].x + rec_array[i].w, rec_array[i].y + rec_array[i].h), (0, 255, 0), 2)
-    #
-    # rec_cluster = rectangles_clustering(rec_array)
-    # for r in rec_cluster:
-    #     print("result = ", r.x, r.y, r.x + r.w, r.y + r.h)
-    #     cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
 
     # print()
 
@@ -261,7 +238,7 @@ def file_open(file, sys, api_preferences):
         frame1 = frame2
         ret, frame2 = cap.read()
 
-        cv2.rectangle(frame, (rec.x, rec.y), (rec.x + rec.w, rec.y + rec.h), (0, 255, 255), 100)
+        cv2.rectangle(frame, (rec.x, rec.y), (rec.x + rec.w, rec.y + rec.h), (0, 255, 255), 5)
 
         cv2.imshow("frame1", frame)
 
