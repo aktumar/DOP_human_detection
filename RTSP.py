@@ -45,10 +45,6 @@ class Rect:
         self.h = h
 
 
-def rectangles_global(rec_new, rec_old):
-    return rec_new
-
-
 def rectangles_union(b_array):
     posX = b_array[0].x
     posY = b_array[0].y
@@ -170,7 +166,7 @@ def rectangles_clustering(b_array, distance):
     return rec_unions
 
 
-def movement_detection(frame1, frame2, area, rec_glob):
+def movement_detection(frame1, frame2, area):
     diff = cv2.absdiff(frame1, frame2)
 
     res = diff.astype(np.uint8)
@@ -202,14 +198,12 @@ def movement_detection(frame1, frame2, area, rec_glob):
             # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
             if max_rec.w * max_rec.h < r.w * r.h:
                 max_rec = r
-        cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
-        rec_glob = rectangles_global(max_rec, rec_glob)
+        # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
     # print()
 
-    # cv2.imshow("frame1", frame1)
+    cv2.imshow("frame1", frame1)
 
-    return frame1, rec_glob
     # time.sleep(1)
 
 
@@ -234,13 +228,11 @@ def file_open(file, sys, api_preferences):
     print("max distance between boxes = ", math.sqrt(frame1.shape[0] * frame1.shape[1] * 0.05))
 
     while True:
-        frame, rec = movement_detection(frame1, frame2, frame1.shape[0] * frame1.shape[1], Rect(450, 500, 1, 1))
+        movement_detection(frame1, frame2, frame1.shape[0] * frame1.shape[1])
         frame1 = frame2
         ret, frame2 = cap.read()
 
-        cv2.rectangle(frame, (rec.x, rec.y), (rec.x + rec.w, rec.y + rec.h), (0, 255, 255), 5)
-
-        cv2.imshow("frame1", frame)
+        cv2.rectangle(frame1, (100, 100), (500, 500), (0, 0, 255), 2)
 
         if cv2.waitKey(1) == 27:
             break
