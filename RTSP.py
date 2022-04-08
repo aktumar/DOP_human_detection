@@ -198,7 +198,7 @@ def movement_detection(frame1, frame2, area):
             # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
             if max_rec.w * max_rec.h < r.w * r.h:
                 max_rec = r
-        # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
+        cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
     # print()
 
@@ -232,7 +232,7 @@ def file_open(file, sys, api_preferences):
         frame1 = frame2
         ret, frame2 = cap.read()
 
-        cv2.rectangle(frame1, (100, 100), (500, 500), (0, 0, 255), 2)
+        # cv2.rectangle(frame1, (100, 100), (500, 500), (0, 0, 255), 2)
 
         if cv2.waitKey(1) == 27:
             break
