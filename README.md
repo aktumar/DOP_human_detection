@@ -15,11 +15,36 @@
 
 ## Installation
 
+1. Open terminal and clone git repository. 
+
 ```python
-# склонируйте гит файл
 git clone https://github.com/aktumar/DOP_human_detection.git
+```
 
+2. Create the virtual environment.
 
+```python
+virtualenv venv
+```
+
+3. Activate the virtual environment.
+
+​	*Windows*
+
+```python
+venv\Scripts\activate
+```
+
+​	*Ubuntu/Linux*
+
+```python
+source venv/bin/activate
+```
+
+4. Run a requirements.txt file to install project’s dependencies
+
+```python
+pip install -r requirements.txt
 ```
 
 
@@ -30,14 +55,21 @@ git clone https://github.com/aktumar/DOP_human_detection.git
 
 To run program use following command:
 
-```python
-# Use your local camera. Write ON to run camera
+1. Use your local camera. Write ON to run camera
+
+```
 python RTSP.py -c ON
+```
 
-# Use RTSP with given .ini file. Choose one computer(camera)
+2. Use RTSP with given .ini file. Choose one computer(camera)
+
+```
 python RTSP.py -u 151
+```
 
-# Use local video path.
+3. Use local video path.
+
+```
 python RTSP.py -v 1.mp4
 ```
 
