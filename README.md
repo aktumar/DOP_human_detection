@@ -57,19 +57,31 @@ To run program use following command:
 
 1. Use your local camera. Write ON to run camera
 
-```
+```python
 python RTSP.py -c ON
 ```
 
-2. Use RTSP with given .ini file. Choose one computer(camera)
+2. Use RTSP with given .ini file. Choose one computer(camera). 
 
-```
-python RTSP.py -u 151
+   .ini file filling example: *rtsp://admin:12345@192.168.1.210:554/Streaming/Channels/101*
+
+```ini
+[10]
+USERNAME = admin
+PASSWORD = 12345
+IP_ADDRESS = 192.168.1.210
+PORT = 554
+DIR = Streaming/Channels
+COMPUTER = 101
 ```
 
-3. Use local video path.
-
+```python
+python RTSP.py -u 10
 ```
+
+3. Use local video path. Make sure that you have entered the correct directory for the video folder.
+
+```python
 python RTSP.py -v 1.mp4
 ```
 
