@@ -213,6 +213,15 @@ Main function
 
 
 def file_open(file, sys, api_preferences):
+    """
+    :param file: - Formed path to video source
+    :param sys: - Name of the window
+    :param api_preferences: - For video capturing with API Preference
+    :return:
+
+    For motion detection, neighboring frames are compared, and then specific boxes with a constant
+    change are identified. The movement_detection function is used to eliminate redundant data.
+    """
     cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
         print('Cannot open file')
@@ -231,7 +240,6 @@ def file_open(file, sys, api_preferences):
         movement_detection(frame1, frame2, frame1.shape[0] * frame1.shape[1])
         frame1 = frame2
         ret, frame2 = cap.read()
-
         # cv2.rectangle(frame1, (100, 100), (500, 500), (0, 0, 255), 2)
 
         if cv2.waitKey(1) == 27:
@@ -242,6 +250,26 @@ def file_open(file, sys, api_preferences):
 
 
 def request_type(args):
+    """
+    :param args: - Pass a variable number of arguments to a function. camera:ON/video:local path/url:rtsp path
+    :return:
+
+    camera: The capturing device connects only if you have given permission by writing 'ON'
+    video:  The video file will be launched if you specify the correct directory.
+            If you want to specify full directory on the command line, you need to overwrite:
+            file_open(args['video'], args['video'], None)
+    url:    You can use the .ini file with the following parameters,
+            .ini file filling example: rtsp://admin:12345@192.168.1.210:554/Streaming/Channels/101
+            [10]
+            USERNAME = admin
+            PASSWORD = 12345
+            IP_ADDRESS = 192.168.1.210
+            PORT = 554
+            DIR = Streaming/Channels
+            COMPUTER = 101
+            If you want to specify full directory on the command line, you need to overwrite:
+            file_open('rtsp://admin:12345@192.168.1.210:554/Streaming/Channels/101', sys, api_preferences)
+    """
     if args['camera'] is not None and args['camera'] == "ON":
         print('[INFO] Opening Web Cam.')
         file_open(0, 'Camera', None)
@@ -263,12 +291,17 @@ def request_type(args):
 
 
 def argsParser():
+    """
+    camera: Use your local capturing device. Write ON to run camera.
+    video:  Use local video file path. Make sure that you have entered the correct directory for the video folder.
+    url:    Use IP video stream with given .ini file. Choose one computer(camera).
+    """
     arg_parse = argparse.ArgumentParser()
     arg_parse.add_argument("-v", "--video", type=str, default=None,
                            help=f"Path to the local video file (select one video from default path \"{path}\"")
     arg_parse.add_argument("-u", "--url", type=str, default=None,
                            help="URL address of RTSP (select one computer: "
-                                "151, 155, 157, 151_min, 155_min, 157_min, 1a, 2a, 3a)")
+                                "151, 155, 157, 151_min, 155_min, 157_min)")
     arg_parse.add_argument("-c", "--camera", type=str, default=None,
                            help="Local Camera (write ON/OFF to use/cancel camera)")
 
