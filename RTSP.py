@@ -13,7 +13,7 @@ VARIABLES
 """
 global api_preferences
 CONFIG_FILE = "settings.ini"
-SYSTEM = ['151', '155', '157', '151_min', '155_min', '157_min', '1a', '2a', '3a']
+SYSTEM = ['151', '155', '157', '151_min', '155_min', '157_min']
 
 """
 OS platform
@@ -46,6 +46,10 @@ class Rect:
 
 
 def rectangles_union(b_array):
+    """
+    :param b_array: - List of boxes that are in the neighborhood
+    :return: - Returns the parameters of a single box obtained by unioning all received boxes.
+    """
     posX = b_array[0].x
     posY = b_array[0].y
     posXR = b_array[0].x + b_array[0].w
@@ -71,6 +75,12 @@ def rectangles_union(b_array):
 
 
 def rectangles_nearest(e, b, dist):
+    """
+    :param e: - Main box
+    :param b: - Box that is checked for neighborhood
+    :param dist: - The maximum allowable distance between neighboring boxes
+    :return: - Returns True if two boxes are neighbors, False if not
+    """
     exl = e.x
     exr = e.x + e.w
     eyt = e.y
@@ -106,6 +116,14 @@ def rectangles_nearest(e, b, dist):
 
 
 def rectangles_clustering(b_array, distance):
+    """
+    :param b_array: - List of filtered boxes
+    :param distance: - The maximum allowable distance between neighboring boxes
+    :return: - List of merged neighboring boxes
+
+    This function is required to identify and combine all potentially neighboring objects.
+    This requires the use of all four corners of the box.
+    """
     b_unions = []
     rec_unions = []
     q = deque()
@@ -161,19 +179,28 @@ def rectangles_clustering(b_array, distance):
             # print(rectangles_union(b_unions).x, rectangles_union(b_unions).y, rectangles_union(b_unions).x +
             #       rectangles_union(b_unions).w, rectangles_union(b_unions).y + rectangles_union(b_unions).h)
             rec_unions.append(rectangles_union(b_unions))
-            # print()
 
     return rec_unions
 
 
 def movement_detection(frame1, frame2, area):
+    """
+    :param frame1: - Old frame
+    :param frame2: - New frame
+    :param area: - Area of general frame
+    :return:
+
+    This function's primary responsibility is to compare old and new frames,
+    using the standard method for detecting the contours of frame`s changed parts,
+    filtering out unnecessary boxes, merging clusters of boxes.
+    """
     diff = cv2.absdiff(frame1, frame2)
 
-    res = diff.astype(np.uint8)
-    percentage = (np.count_nonzero(res) * 100) / res.size
-    if percentage > 30:
-        # print("percentage = ", percentage)
-        pass
+    # res = diff.astype(np.uint8)
+    # percentage = (np.count_nonzero(res) * 100) / res.size
+    # if percentage > 30:
+    #     print("percentage = ", percentage)
+    #     pass
 
     gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -200,10 +227,7 @@ def movement_detection(frame1, frame2, area):
                 max_rec = r
         cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
-    # print()
-
     cv2.imshow("frame1", frame1)
-
     # time.sleep(1)
 
 
@@ -236,8 +260,10 @@ def file_open(file, sys, api_preferences):
     print("small boxes = ", frame1.shape[0] * frame1.shape[1] * 0.01)
     print("max distance between boxes = ", math.sqrt(frame1.shape[0] * frame1.shape[1] * 0.05))
 
+    area = frame1.shape[0] * frame1.shape[1]
+
     while True:
-        movement_detection(frame1, frame2, frame1.shape[0] * frame1.shape[1])
+        movement_detection(frame1, frame2, area)
         frame1 = frame2
         ret, frame2 = cap.read()
         # cv2.rectangle(frame1, (100, 100), (500, 500), (0, 0, 255), 2)
