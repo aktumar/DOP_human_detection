@@ -2,7 +2,9 @@ import os
 import cv2
 import time
 import math
+import bisect
 import argparse
+import statistics
 import numpy as np
 import configparser
 from sys import platform
@@ -240,30 +242,37 @@ def file_open(file, sys, api_preferences):
     area = frame1.shape[0] * frame1.shape[1]
 
     update = 0
-    old_box = None
+    xr = []
+    xl = []
+    yt = []
+    yb = []
     box = None
+
     while True:
-        if update == 150:
+        if update == 1000:
             update = 0
-            old_box = None
-            box = None
+            xr = []
+            xl = []
+            yt = []
+            yb = []
 
         frame, new_box = movement_detection(frame1, frame2, area)
         frame1 = frame2
         ret, frame2 = cap.read()
 
         if new_box:
-            if old_box:
-                box = rectangles_union([new_box, old_box])
-            else:
-                box = new_box
-        else:
-            if old_box:
-                box = old_box
-            else:
-                pass
-        old_box = box
+            bisect.insort(xr, new_box.x + new_box.w)
+            bisect.insort(xl, new_box.x)
+            bisect.insort(yt, new_box.y)
+            bisect.insort(yb, new_box.y + new_box.h)
+
+            box = Rect(int(statistics.median(xl)),
+                       int(statistics.median(yt)),
+                       int(statistics.median(xr) - statistics.median(xl)),
+                       int(statistics.median(yb) - statistics.median(yt)))
+
         if box:
+            # print("-------->", box.x, box.y, box.w, box.h)
             cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), (0, 255, 255), 2)
 
         cv2.imshow("frame", frame)
