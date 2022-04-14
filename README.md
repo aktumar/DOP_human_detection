@@ -85,3 +85,7 @@ python RTSP.py -u 10
 python RTSP.py -v 1.mp4
 ```
 
+<p align="center">
+    <img width="70%" src="https://github.com/aktumar/DOP_human_detection/blob/main/asset/Animation.gif"/> 
+</p>
+
