@@ -203,7 +203,7 @@ def movement_detection(frame1, frame2, area):
             # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
             if max_rec.w * max_rec.h < r.w * r.h:
                 max_rec = r
-        cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
+        # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
     # time.sleep(1)
     return frame1, max_rec
@@ -225,6 +225,9 @@ def file_open(file, sys, api_preferences):
     change are identified. The movement_detection function is used to eliminate redundant data.
     """
 
+    next_box_union = False
+    median_box = True
+
     cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
         print("Cannot open file")
@@ -241,65 +244,59 @@ def file_open(file, sys, api_preferences):
 
     area = frame1.shape[0] * frame1.shape[1]
 
-    """
-    update = 0
-    xr = []
-    xl = []
-    yt = []
-    yb = []
-    box = None
+    update = 0  # general variable
+    box = None  # general variable
+    xr = []  # for median_box
+    xl = []  # for median_box
+    yt = []  # for median_box
+    yb = []  # for median_box
+    old_box = None  # for next_box_union
 
     while True:
-        if update == 1000:
-            update = 0
-            xr = []
-            xl = []
-            yt = []
-            yb = []
 
         frame, new_box = movement_detection(frame1, frame2, area)
         frame1 = frame2
         ret, frame2 = cap.read()
 
-        if new_box:
-            bisect.insort(xr, new_box.x + new_box.w)
-            bisect.insort(xl, new_box.x)
-            bisect.insort(yt, new_box.y)
-            bisect.insort(yb, new_box.y + new_box.h)
+        if median_box:
+            print(update)
+            if update == 1000:
+                update = 0
+                xr = []
+                xl = []
+                yt = []
+                yb = []
 
-            box = Rect(int(statistics.median(xl)),
-                       int(statistics.median(yt)),
-                       int(statistics.median(xr) - statistics.median(xl)),
-                       int(statistics.median(yb) - statistics.median(yt)))
-                       
-    """
-    update = 0
-    old_box = None
-    box = None
-    while True:
-        if update == 150:
-            update = 0
-            old_box = None
-            box = None
+            if new_box:
+                bisect.insort(xr, new_box.x + new_box.w)
+                bisect.insort(xl, new_box.x)
+                bisect.insort(yt, new_box.y)
+                bisect.insort(yb, new_box.y + new_box.h)
 
-        frame, new_box = movement_detection(frame1, frame2, area)
-        frame1 = frame2
-        ret, frame2 = cap.read()
+                box = Rect(int(statistics.median(xl)),
+                           int(statistics.median(yt)),
+                           int(statistics.median(xr) - statistics.median(xl)),
+                           int(statistics.median(yb) - statistics.median(yt)))
 
-        if new_box:
-            if old_box:
-                box = rectangles_union([new_box, old_box])
+        if next_box_union:
+            if update == 150:
+                update = 0
+                old_box = None
+                box = None
+
+            if new_box:
+                if old_box:
+                    box = rectangles_union([new_box, old_box])
+                else:
+                    box = new_box
             else:
-                box = new_box
-        else:
-            if old_box:
-                box = old_box
-            else:
-                pass
-        old_box = box
+                if old_box:
+                    box = old_box
+                else:
+                    pass
+            old_box = box
 
         if box:
-            # print("-------->", box.x, box.y, box.w, box.h)
             cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), (0, 255, 255), 2)
 
         cv2.imshow("frame", frame)
