@@ -15,7 +15,7 @@ VARIABLES
 """
 global api_preferences
 CONFIG_FILE = "settings.ini"
-SYSTEM = ["151", "155", "157", "151_min", "155_min", "157_min"]
+SYSTEM = ["151", "155", "157", "151_min", "155_min", "157_min", "1a", "2a", "3a"]
 
 """
 OS platform
@@ -192,7 +192,7 @@ def movement_detection(frame1, frame2, area):
         (x, y, w, h) = cv2.boundingRect(contour)
         if cv2.contourArea(contour) < area * 0.01:
             continue
-        cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     max_rec = None
@@ -200,7 +200,7 @@ def movement_detection(frame1, frame2, area):
         rec_cluster = rectangles_clustering(rec_array, math.sqrt(area * 0.05))
         max_rec = rec_cluster[0]
         for r in rec_cluster:
-            cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
+            # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
             if max_rec.w * max_rec.h < r.w * r.h:
                 max_rec = r
         # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
@@ -253,19 +253,19 @@ def file_open(file, sys, api_preferences):
     old_box = None  # for next_box_union
 
     while True:
-
         frame, new_box = movement_detection(frame1, frame2, area)
         frame1 = frame2
         ret, frame2 = cap.read()
 
         if median_box:
             print(update)
-            if update == 1000:
+            if update == 500:
                 update = 0
-                xr = []
-                xl = []
-                yt = []
-                yb = []
+                xr.clear()
+                xl.clear()
+                yt.clear()
+                yb.clear()
+                box = None
 
             if new_box:
                 bisect.insort(xr, new_box.x + new_box.w)
