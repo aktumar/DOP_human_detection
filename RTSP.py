@@ -10,6 +10,9 @@ import configparser
 from sys import platform
 from collections import deque
 
+import logging
+from PyQt5 import QtWidgets
+
 """
 VARIABLES
 """
@@ -252,14 +255,18 @@ def file_open(file, sys, api_preferences):
     yb = []  # for median_box
     old_box = None  # for next_box_union
 
+    frame_step = 0
     while True:
+        if frame_step == 5:
+            frame_step = 0
+        frame_step = frame_step + 1
+
         frame, new_box = movement_detection(frame1, frame2, area)
         frame1 = frame2
         ret, frame2 = cap.read()
 
         if median_box:
-            print(update)
-            if update == 500:
+            if update == 400:
                 update = 0
                 xr.clear()
                 xl.clear()
@@ -331,7 +338,7 @@ def request_type(args):
             file_open('rtsp://admin:12345@192.168.1.210:554/Streaming/Channels/101', sys, api_preferences)
     """
 
-    if args["camera"] is not None and args["camera"] == "ON":
+    if args["camera"] is not None and args["camera"] == "true":
         print("[INFO] Opening Web Cam.")
         file_open(0, "Camera", None)
     elif args["video"] is not None:
@@ -362,10 +369,9 @@ def argsParser():
     arg_parse.add_argument("-v", "--video", type=str, default=None,
                            help=f"Path to the local video file (select one video from default path \"{path}\"")
     arg_parse.add_argument("-u", "--url", type=str, default=None,
-                           help="URL address of RTSP (select one computer: "
-                                "151, 155, 157, 151_min, 155_min, 157_min)")
+                           help="URL address of RTSP (select one computer from .ini file")
     arg_parse.add_argument("-c", "--camera", type=str, default=None,
-                           help="Local Camera (write ON/OFF to use/cancel camera)")
+                           help="Local Camera (write true/false to use/cancel camera)")
 
     args = vars(arg_parse.parse_args())
     return args
