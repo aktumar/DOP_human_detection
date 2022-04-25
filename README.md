@@ -64,7 +64,7 @@ To see all the logs on the user interface, before running, you need to open [cut
 start cutelog
 ```
 <p align="center">
-    <img width="70%" src="https://github.com/aktumar/DOP_human_detection/blob/main/asset/Logging.png"/> 
+    <img width="100%" src="https://github.com/aktumar/DOP_human_detection/blob/main/asset/Logging.png"/> 
 </p>
 
 
