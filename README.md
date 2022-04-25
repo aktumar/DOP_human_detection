@@ -61,10 +61,15 @@ pip install -r requirements.txt
 
 To run program use following command:
 
+0. To see all the logs on the user interface, before running, you need to open cutelog with the command:
+```python
+start cutelog
+```
+
 1. Use your local camera. Write ON to run camera
 
 ```python
-python RTSP.py -c true
+python run.py -c true
 ```
 
 2. Use RTSP with given .ini file. Choose one computer(camera). 
@@ -82,13 +87,13 @@ COMPUTER = 101
 ```
 
 ```python
-python RTSP.py -u 10
+python run.py -u 10
 ```
 
 3. Use local video path. Make sure that you have entered the correct directory for the video folder.
 
 ```python
-python RTSP.py -v 1.mp4
+python run.py -v 1.mp4
 ```
 
 

@@ -1,20 +1,9 @@
 import cv2
 import math
 import bisect
-import logging
+import log as l
 import statistics
 import geometry_proccessing as gp
-
-from sys import platform
-from logging.handlers import SocketHandler
-
-"""
-LOGGING
-"""
-log = logging.getLogger(platform)
-log.setLevel(1)
-socket_handler = SocketHandler('127.0.0.1', 19996)
-log.addHandler(socket_handler)
 
 
 def file_open(file, sys, api_preferences):
@@ -54,6 +43,7 @@ def file_open(file, sys, api_preferences):
     yt = []  # for median_box
     yb = []  # for median_box
     old_box = None  # for next_box_union
+    event = False
 
     while True:
         frame, new_box = gp.movement_detection(frame1, frame2, area)
@@ -70,15 +60,20 @@ def file_open(file, sys, api_preferences):
                 box = None
 
             if new_box:
+                if not event:
+                    event = True
+
                 bisect.insort(xr, new_box.x + new_box.w)
                 bisect.insort(xl, new_box.x)
                 bisect.insort(yt, new_box.y)
                 bisect.insort(yb, new_box.y + new_box.h)
 
                 box = gp.Rect(int(statistics.median(xl)),
-                           int(statistics.median(yt)),
-                           int(statistics.median(xr) - statistics.median(xl)),
-                           int(statistics.median(yb) - statistics.median(yt)))
+                              int(statistics.median(yt)),
+                              int(statistics.median(xr) - statistics.median(xl)),
+                              int(statistics.median(yb) - statistics.median(yt)))
+            else:
+                event = False
 
         if next_box_union:
             if update == 150:
@@ -87,6 +82,11 @@ def file_open(file, sys, api_preferences):
                 box = None
 
             if new_box:
+                if event:
+                    event = False
+                else:
+                    event = True
+
                 if old_box:
                     box = gp.rectangles_union([new_box, old_box])
                 else:
@@ -100,6 +100,8 @@ def file_open(file, sys, api_preferences):
 
         if box:
             cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), (0, 255, 255), 2)
+            if event:
+                l.log.warning(f"Зафиксировано движение. Источник: {sys}")
 
         cv2.imshow("frame", frame)
         update = update + 1

@@ -169,5 +169,4 @@ def movement_detection(frame1, frame2, area):
                 max_rec = r
         # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
 
-    # time.sleep(1)
     return frame1, max_rec
