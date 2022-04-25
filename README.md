@@ -59,12 +59,14 @@ pip install -r requirements.txt
 
 ## Run
 
-To run program use following command:
-
-0. To see all the logs on the user interface, before running, you need to open [cutelog](https://github.com/busimus/cutelog) with the command:
+To see all the logs on the user interface, before running, you need to open [cutelog](https://github.com/busimus/cutelog) with the command:
 ```python
 start cutelog
 ```
+
+
+To run program use following command:
+
 
 1. Use your local camera. Write 'true' to run camera
 
