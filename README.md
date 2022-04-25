@@ -63,6 +63,9 @@ To see all the logs on the user interface, before running, you need to open [cut
 ```python
 start cutelog
 ```
+<p align="center">
+    <img width="70%" src="https://github.com/aktumar/DOP_human_detection/blob/main/asset/Logging.png"/> 
+</p>
 
 
 To run program use following command:

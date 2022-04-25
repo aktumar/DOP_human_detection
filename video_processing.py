@@ -108,6 +108,6 @@ def file_open(file, sys, api_preferences):
 
         if cv2.waitKey(1) == 27:
             break
-
+    l.log.error(f"Зафиксировано читерство. Источник: {sys}")
     cap.release()
     cv2.destroyAllWindows()
