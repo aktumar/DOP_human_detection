@@ -1,17 +1,10 @@
 import os
 import cv2
-import time
-import math
-import bisect
 import argparse
-import statistics
-import numpy as np
 import configparser
-from sys import platform
-from collections import deque
+import video_processing as vid
 
-import logging
-from PyQt5 import QtWidgets
+from sys import platform
 
 """
 VARIABLES
@@ -36,284 +29,6 @@ Camera configuration
 """
 config = (configparser.ConfigParser())
 config.read(CONFIG_FILE)
-
-"""
-Functions
-"""
-
-
-class Rect:
-    def __init__(self, x, y, w, h):
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-
-
-def rectangles_union(b_array):
-    """
-    :param b_array: - List of boxes that are in the neighborhood
-    :return: - Returns the parameters of a single box obtained by unioning all received boxes.
-    """
-
-    posX = b_array[0].x
-    posY = b_array[0].y
-    posXR = b_array[0].x + b_array[0].w
-    posYB = b_array[0].y + b_array[0].h
-
-    for i in range(1, len(b_array)):
-        if b_array[i].x < posX:
-            posX = b_array[i].x
-        if b_array[i].y < posY:
-            posY = b_array[i].y
-        if b_array[i].x + b_array[i].w > posXR:
-            posXR = b_array[i].x + b_array[i].w
-        if b_array[i].y + b_array[i].h > posYB:
-            posYB = b_array[i].y + b_array[i].h
-
-    posW = posXR - posX
-    posH = posYB - posY
-
-    return Rect(posX, posY, posW, posH)
-
-
-def rectangles_nearest(e, b, dist):
-    """
-    :param e: - Main box
-    :param b: - Box that is checked for neighborhood
-    :param dist: - The maximum allowable distance between neighboring boxes
-    :return: - Returns True if two boxes are neighbors, False if not
-    """
-
-    exl = e.x
-    exr = e.x + e.w
-    eyt = e.y
-    eyb = e.y + e.h
-
-    bxl = b.x
-    bxr = b.x + b.w
-    byt = b.y
-    byb = b.y + b.h
-
-    cont = False
-
-    if abs(exl - bxl) <= dist:
-        cont = True
-    if abs(exl - bxr) <= dist:
-        cont = True
-    if abs(exr - bxl) <= dist:
-        cont = True
-    if abs(exr - bxr) <= dist:
-        cont = True
-
-    if cont:
-        if abs(eyt - byt) <= dist:
-            return True
-        if abs(eyt - byb) <= dist:
-            return True
-        if abs(eyb - byt) <= dist:
-            return True
-        if abs(eyb - byb) <= dist:
-            return True
-
-    return False
-
-
-def rectangles_clustering(b_array, distance):
-    """
-    :param b_array: - List of filtered boxes
-    :param distance: - The maximum allowable distance between neighboring boxes
-    :return: - List of merged neighboring boxes
-
-    This function is required to identify and combine all potentially neighboring objects.
-    This requires the use of all four corners of the box.
-    """
-
-    b_unions = []
-    rec_unions = []
-    q = deque()
-
-    while b_array:
-        if q:
-            element = q.popleft()
-            b_unions.append(element)
-            for i in range(len(b_array)):
-                if rectangles_nearest(element, b_array[i], distance):
-                    q.append(b_array[i])
-                    b_array[i] = None
-            b_array[:] = (value for value in b_array if value is not None)
-        else:
-            if b_unions:
-                rec_unions.append(rectangles_union(b_unions))
-                b_unions.clear()
-
-            element = b_array.pop(0)
-
-            if not b_array:
-                rec_unions.append(element)
-                break
-
-            b_unions.append(element)
-
-            for i in range(len(b_array)):
-                if rectangles_nearest(element, b_array[i], distance):
-                    q.append(b_array[i])
-                    b_array[i] = None
-
-            b_array[:] = (value for value in b_array if value is not None)
-
-        if not b_array:
-            while q:
-                b_unions.append(q.popleft())
-            rec_unions.append(rectangles_union(b_unions))
-
-    return rec_unions
-
-
-def movement_detection(frame1, frame2, area):
-    """
-    :param frame1: - Old frame
-    :param frame2: - New frame
-    :param area: - Area of general frame
-    :return:
-
-    This function's primary responsibility is to compare old and new frames,
-    using the standard method for detecting the contours of frame`s changed parts,
-    filtering out unnecessary boxes, merging clusters of boxes.
-    """
-
-    diff = cv2.absdiff(frame1, frame2)
-
-    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    _, thresh = cv2.threshold(blur, 20, 255, cv2.THRESH_BINARY)
-    dilated = cv2.dilate(thresh, None, iterations=3)
-
-    rec_array = []
-    contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    for contour in contours:
-        (x, y, w, h) = cv2.boundingRect(contour)
-        if cv2.contourArea(contour) < area * 0.01:
-            continue
-        # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        rec_array.append(Rect(x, y, w, h))
-
-    max_rec = None
-    if rec_array:
-        rec_cluster = rectangles_clustering(rec_array, math.sqrt(area * 0.05))
-        max_rec = rec_cluster[0]
-        for r in rec_cluster:
-            # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
-            if max_rec.w * max_rec.h < r.w * r.h:
-                max_rec = r
-        # cv2.rectangle(frame1, (max_rec.x, max_rec.y), (max_rec.x + max_rec.w, max_rec.y + max_rec.h), (0, 0, 255), 2)
-
-    # time.sleep(1)
-    return frame1, max_rec
-
-
-"""
-Main function
-"""
-
-
-def file_open(file, sys, api_preferences):
-    """
-    :param file: - Formed path to video source
-    :param sys: - Name of the window
-    :param api_preferences: - For video capturing with API Preference
-    :return:
-
-    For motion detection, neighboring frames are compared, and then specific boxes with a constant
-    change are identified. The movement_detection function is used to eliminate redundant data.
-    """
-
-    next_box_union = False
-    median_box = True
-
-    cap = cv2.VideoCapture(file, api_preferences)
-    if not cap.isOpened():
-        print("Cannot open file")
-        exit(-1)
-
-    ret, frame1 = cap.read()
-    ret, frame2 = cap.read()
-
-    print("width = ", frame1.shape[1])
-    print("height = ", frame1.shape[0])
-
-    print("small boxes = ", frame1.shape[0] * frame1.shape[1] * 0.01)
-    print("max distance between boxes = ", math.sqrt(frame1.shape[0] * frame1.shape[1] * 0.05))
-
-    area = frame1.shape[0] * frame1.shape[1]
-
-    update = 0  # general variable
-    box = None  # general variable
-    xr = []  # for median_box
-    xl = []  # for median_box
-    yt = []  # for median_box
-    yb = []  # for median_box
-    old_box = None  # for next_box_union
-
-    frame_step = 0
-    while True:
-        if frame_step == 5:
-            frame_step = 0
-        frame_step = frame_step + 1
-
-        frame, new_box = movement_detection(frame1, frame2, area)
-        frame1 = frame2
-        ret, frame2 = cap.read()
-
-        if median_box:
-            if update == 400:
-                update = 0
-                xr.clear()
-                xl.clear()
-                yt.clear()
-                yb.clear()
-                box = None
-
-            if new_box:
-                bisect.insort(xr, new_box.x + new_box.w)
-                bisect.insort(xl, new_box.x)
-                bisect.insort(yt, new_box.y)
-                bisect.insort(yb, new_box.y + new_box.h)
-
-                box = Rect(int(statistics.median(xl)),
-                           int(statistics.median(yt)),
-                           int(statistics.median(xr) - statistics.median(xl)),
-                           int(statistics.median(yb) - statistics.median(yt)))
-
-        if next_box_union:
-            if update == 150:
-                update = 0
-                old_box = None
-                box = None
-
-            if new_box:
-                if old_box:
-                    box = rectangles_union([new_box, old_box])
-                else:
-                    box = new_box
-            else:
-                if old_box:
-                    box = old_box
-                else:
-                    pass
-            old_box = box
-
-        if box:
-            cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), (0, 255, 255), 2)
-
-        cv2.imshow("frame", frame)
-        update = update + 1
-
-        if cv2.waitKey(1) == 27:
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
 
 
 def request_type(args):
@@ -340,10 +55,10 @@ def request_type(args):
 
     if args["camera"] is not None and args["camera"] == "true":
         print("[INFO] Opening Web Cam.")
-        file_open(0, "Camera", None)
+        vid.file_open(0, "Camera", None)
     elif args["video"] is not None:
         print("[INFO] Opening Video from path.")
-        file_open(path + args["video"], args["video"], None)
+        vid.file_open(path + args["video"], args["video"], None)
     elif args["url"] is not None and args["url"] in SYSTEM:
         print("[INFO] Opening URL of Real-Time Streaming Protocol.")
         sys = args["url"]
@@ -355,7 +70,7 @@ def request_type(args):
         computer = config[sys]["COMPUTER"]
         RTSP_URL = f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
         print(RTSP_URL)
-        file_open(RTSP_URL, sys, api_preferences)
+        vid.file_open(RTSP_URL, sys, api_preferences)
 
 
 def argsParser():
