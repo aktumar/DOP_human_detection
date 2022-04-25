@@ -2,8 +2,22 @@ import cv2
 import math
 import bisect
 import log as l
+import threading
 import statistics
 import geometry_proccessing as gp
+
+
+class CaptureThread(threading.Thread):
+
+    def __init__(self, file, sys, api_preferences):
+        threading.Thread.__init__(self)
+        self.sys = sys
+        self.file = file
+        self.api_preferences = api_preferences
+
+    def run(self):
+        print("Starting " + self.sys)
+        file_open(self.file, self.sys, self.api_preferences)
 
 
 def file_open(file, sys, api_preferences):
@@ -108,6 +122,6 @@ def file_open(file, sys, api_preferences):
 
         if cv2.waitKey(1) == 27:
             break
-    l.log.error(f"Зафиксировано читерство. Источник: {sys}")
+
     cap.release()
     cv2.destroyAllWindows()
