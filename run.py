@@ -12,7 +12,8 @@ VARIABLES
 global api_preferences
 CONFIG_FILE = "settings.ini"
 # SYSTEM = ["151", "155", "157", "151_min", "155_min", "157_min", "1a", "2a", "3a"]
-SYSTEM = ["151", "155", "157"]
+SYSTEM = ["1a", "2a", "3a"]
+# SYSTEM = ["151", "155", "157"]
 
 """
 OS platform
