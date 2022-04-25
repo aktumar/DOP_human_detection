@@ -64,7 +64,7 @@ To run program use following command:
 1. Use your local camera. Write ON to run camera
 
 ```python
-python RTSP.py -c ON
+python RTSP.py -c true
 ```
 
 2. Use RTSP with given .ini file. Choose one computer(camera). 
