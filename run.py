@@ -1,5 +1,6 @@
 import os
 import cv2
+import config
 import argparse
 import configparser
 from video_processing import CaptureThread
@@ -10,10 +11,6 @@ from sys import platform
 VARIABLES
 """
 global api_preferences
-CONFIG_FILE = "settings.ini"
-# SYSTEM = ["151", "155", "157", "151_min", "155_min", "157_min", "1a", "2a", "3a"]
-SYSTEM = ["1a", "2a", "3a"]
-# SYSTEM = ["151", "155", "157"]
 
 """
 OS platform
@@ -29,8 +26,18 @@ elif platform == "linux" or platform == "linux2":
 """
 Camera configuration
 """
-config = (configparser.ConfigParser())
-config.read(CONFIG_FILE)
+file = (configparser.ConfigParser())
+file.read(config.INI_FILE)
+
+
+def url_gen(sys):
+    username = file[sys]["USERNAME"]
+    password = file[sys]["PASSWORD"]
+    ip_address = file[sys]["IP_ADDRESS"]
+    port = file[sys]["PORT"]
+    dir = file[sys]["DIR"]
+    computer = file[sys]["COMPUTER"]
+    return f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
 
 
 def request_type(args):
@@ -57,33 +64,23 @@ def request_type(args):
 
     if args["camera"] is not None and args["camera"] == "true":
         print("[INFO] Opening Web Cam.")
-        CaptureThread(0, "Camera1", None).start()
+        CaptureThread(0, "Camera", None).start()
     elif args["video"] is not None:
         print("[INFO] Opening Video from path.")
         CaptureThread(path + args["video"], args["video"], None).start()
     elif args["url"] is not None:
         if args["url"] == "all":
             print("[INFO] Opening URL of Real-Time Streaming Protocol.")
-            for sys in SYSTEM:
-                RTSP_URL = url_gen(sys)
-                print(RTSP_URL)
-                CaptureThread(RTSP_URL, sys, api_preferences).start()
+            for sys in config.COMPUTERS:
+                rtsp_url = url_gen(sys)
+                print(rtsp_url)
+                CaptureThread(rtsp_url, sys, api_preferences).start()
 
-        elif args["url"] in SYSTEM:
+        elif args["url"] in config.COMPUTERS:
             print("[INFO] Opening URL of Real-Time Streaming Protocol.")
-            RTSP_URL = url_gen(args["url"])
-            print(RTSP_URL)
-            CaptureThread(RTSP_URL, args["url"], api_preferences).start()
-
-
-def url_gen(sys):
-    username = config[sys]["USERNAME"]
-    password = config[sys]["PASSWORD"]
-    ip_address = config[sys]["IP_ADDRESS"]
-    port = config[sys]["PORT"]
-    dir = config[sys]["DIR"]
-    computer = config[sys]["COMPUTER"]
-    return f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
+            rtsp_url = url_gen(args["url"])
+            print(rtsp_url)
+            CaptureThread(rtsp_url, args["url"], api_preferences).start()
 
 
 def argsParser():

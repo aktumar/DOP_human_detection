@@ -1,6 +1,7 @@
 import cv2
 import math
 import bisect
+import config
 import log as l
 import threading
 import statistics
@@ -31,9 +32,6 @@ def file_open(file, sys, api_preferences):
     change are identified. The movement_detection function is used to eliminate redundant data.
     """
 
-    next_box_union = False
-    median_box = True
-
     cap = cv2.VideoCapture(file, api_preferences)
     if not cap.isOpened():
         print("Cannot open file")
@@ -45,8 +43,8 @@ def file_open(file, sys, api_preferences):
     print("width = ", frame1.shape[1])
     print("height = ", frame1.shape[0])
 
-    print("small boxes = ", frame1.shape[0] * frame1.shape[1] * 0.01)
-    print("max distance between boxes = ", math.sqrt(frame1.shape[0] * frame1.shape[1] * 0.05))
+    print("small boxes = ", frame1.shape[0] * frame1.shape[1] * config.PERCENT_BOX_AREA)
+    print("max distance between boxes = ", math.sqrt(frame1.shape[0] * frame1.shape[1] * config.PERCENT_BOX_DISTANCE))
 
     area = frame1.shape[0] * frame1.shape[1]
 
@@ -64,8 +62,8 @@ def file_open(file, sys, api_preferences):
         frame1 = frame2
         ret, frame2 = cap.read()
 
-        if median_box:
-            if update == 400:
+        if config.PROCESS_MEDIAN:
+            if update == config.COUNT_NEXT_BOX_FRAME_UPDATE:
                 update = 0
                 xr.clear()
                 xl.clear()
@@ -89,8 +87,8 @@ def file_open(file, sys, api_preferences):
             else:
                 event = False
 
-        if next_box_union:
-            if update == 150:
+        if config.PROCESS_NEXT_BOX:
+            if update == config.COUNT_MEDIAN_FRAME_UPDATE:
                 update = 0
                 old_box = None
                 box = None
@@ -113,7 +111,7 @@ def file_open(file, sys, api_preferences):
             old_box = box
 
         if box:
-            cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), (0, 255, 255), 2)
+            cv2.rectangle(frame, (box.x, box.y), (box.x + box.w, box.y + box.h), config.BOX_COLOR, config.BOX_THICKNESS)
             if event:
                 l.log.warning(f"Зафиксировано движение. Источник: {sys}")
 

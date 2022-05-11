@@ -1,5 +1,6 @@
 import cv2
 import math
+import config
 from collections import deque
 
 
@@ -154,14 +155,14 @@ def movement_detection(frame1, frame2, area):
     contours, _ = cv2.findContours(dilated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     for contour in contours:
         (x, y, w, h) = cv2.boundingRect(contour)
-        if cv2.contourArea(contour) < area * 0.01:
+        if cv2.contourArea(contour) < area * config.PERCENT_BOX_AREA:
             continue
         # cv2.rectangle(frame1, (x, y), (x + w, y + h), (0, 255, 0), 2)
         rec_array.append(Rect(x, y, w, h))
 
     max_rec = None
     if rec_array:
-        rec_cluster = rectangles_clustering(rec_array, math.sqrt(area * 0.05))
+        rec_cluster = rectangles_clustering(rec_array, math.sqrt(area * config.PERCENT_BOX_DISTANCE))
         max_rec = rec_cluster[0]
         for r in rec_cluster:
             # cv2.rectangle(frame1, (r.x, r.y), (r.x + r.w, r.y + r.h), (0, 0, 255), 2)
