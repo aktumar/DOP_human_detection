@@ -65,28 +65,25 @@ def request_type(args):
         if args["url"] == "all":
             print("[INFO] Opening URL of Real-Time Streaming Protocol.")
             for sys in SYSTEM:
-                username = config[sys]["USERNAME"]
-                password = config[sys]["PASSWORD"]
-                ip_address = config[sys]["IP_ADDRESS"]
-                port = config[sys]["PORT"]
-                dir = config[sys]["DIR"]
-                computer = config[sys]["COMPUTER"]
-                RTSP_URL = f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
+                RTSP_URL = url_gen(sys)
                 print(RTSP_URL)
                 CaptureThread(RTSP_URL, sys, api_preferences).start()
 
         elif args["url"] in SYSTEM:
             print("[INFO] Opening URL of Real-Time Streaming Protocol.")
-            sys = args["url"]
-            username = config[sys]["USERNAME"]
-            password = config[sys]["PASSWORD"]
-            ip_address = config[sys]["IP_ADDRESS"]
-            port = config[sys]["PORT"]
-            dir = config[sys]["DIR"]
-            computer = config[sys]["COMPUTER"]
-            RTSP_URL = f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
+            RTSP_URL = url_gen(args["url"])
             print(RTSP_URL)
-            CaptureThread(RTSP_URL, sys, api_preferences).start()
+            CaptureThread(RTSP_URL, args["url"], api_preferences).start()
+
+
+def url_gen(sys):
+    username = config[sys]["USERNAME"]
+    password = config[sys]["PASSWORD"]
+    ip_address = config[sys]["IP_ADDRESS"]
+    port = config[sys]["PORT"]
+    dir = config[sys]["DIR"]
+    computer = config[sys]["COMPUTER"]
+    return f"rtsp://{username}:{password}@{ip_address}:{port}/{dir}/{computer}"
 
 
 def argsParser():
