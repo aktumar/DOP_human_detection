@@ -132,7 +132,7 @@ dmypy.json
 .idea/
 
 # secret
-settings.ini
+config.ini
 protocol.conf
 tutorials/yolo_tut/yolov3.weights
 

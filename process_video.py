@@ -5,7 +5,7 @@ import config
 import log as l
 import threading
 import statistics
-import geometry_proccessing as gp
+import process_geometry as gp
 
 
 class CaptureThread(threading.Thread):

@@ -3,9 +3,8 @@ import cv2
 import config
 import argparse
 import configparser
-from video_processing import CaptureThread
-
 from sys import platform
+from process_video import CaptureThread
 
 """
 VARIABLES
@@ -18,10 +17,8 @@ OS platform
 if platform == "win32":
     os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
     api_preferences = cv2.CAP_FFMPEG
-    path = "C:/Users/rakhymova.a/Desktop/vid/"
 elif platform == "linux" or platform == "linux2":
     api_preferences = None
-    path = "/home/aktumar/my_projects/Freelance/video_UNT/"
 
 """
 Camera configuration
@@ -67,7 +64,7 @@ def request_type(args):
         CaptureThread(0, "Camera", None).start()
     elif args["video"] is not None:
         print("[INFO] Opening Video from path.")
-        CaptureThread(path + args["video"], args["video"], None).start()
+        CaptureThread(config.PATH_TO_VIDEO + args["video"], args["video"], None).start()
     elif args["url"] is not None:
         if args["url"] == "all":
             print("[INFO] Opening URL of Real-Time Streaming Protocol.")
@@ -92,7 +89,8 @@ def argsParser():
 
     arg_parse = argparse.ArgumentParser()
     arg_parse.add_argument("-v", "--video", type=str, default=None,
-                           help=f"Path to the local video file (select one video from default path \"{path}\"")
+                           help=f"Path to the local video file (select one video from default path "
+                                f"\"{config.PATH_TO_VIDEO}\"")
     arg_parse.add_argument("-u", "--url", type=str, default=None,
                            help="URL address of RTSP (select one computer from .ini file")
     arg_parse.add_argument("-c", "--camera", type=str, default=None,
