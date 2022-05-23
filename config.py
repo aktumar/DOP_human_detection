@@ -22,8 +22,8 @@ INI_FILE = "config.ini"
 # COMPUTERS = ["151", "155", "157", "151_min", "155_min", "157_min", "1a", "2a", "3a"]
 # COMPUTERS = ["151_min", "155_min", "157_min", "151", "155", "157"]
 # COMPUTERS = ["151_min", "155_min", "157_min"]
-COMPUTERS = ["151", "155", "157"]
-# COMPUTERS = ["1a", "2a", "3a"]
+# COMPUTERS = ["151", "155", "157"]
+COMPUTERS = ["1a", "2a", "3a"]
 
 if platform == "win32":
     PATH_TO_VIDEO = "C:/Users/rakhymova.a/Desktop/vid/"
