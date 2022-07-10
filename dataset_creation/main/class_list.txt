@@ -1,0 +1,12 @@
+smartphone
+mouse
+keyboard
+calculator
+phone
+smartwatch
+tablet
+watch
+laptopkeyboard
+earphones
+translate
+not_translate
