@@ -1,6 +1,11 @@
 import os
 
-pwd = "/home/aktumar/my_projects/Freelance/DOP_Dataset_creation/main/command_dataset/7 команда/input"
+# pwd = "/home/aktumar/my_projects/Freelance/D_human_detection/dataset_creation/main/command_dataset/1 команда/output/YOLO_darknet"
+# pwd = "/home/aktumar/my_projects/Freelance/D_human_detection/dataset_creation/main/command_dataset/2 команда/output/YOLO_darknet"
+# pwd = "/home/aktumar/my_projects/Freelance/D_human_detection/dataset_creation/main/command_dataset/3 команда/output/YOLO_darknet"
+# pwd = "/home/aktumar/my_projects/Freelance/D_human_detection/dataset_creation/main/command_dataset/4 команда/output/YOLO_darknet"
+# pwd = "/home/aktumar/my_projects/Freelance/D_human_detection/dataset_creation/main/command_dataset/5 команда/output/YOLO_darknet"
+
 i = 0
 for filename in os.listdir(pwd):
     with open(os.path.join(pwd, filename), 'r') as f:
