@@ -9,8 +9,8 @@ SCORE_THRESHOLD = 0.5
 IOU_THRESHOLD = 0.5
 
 config_path = "cfg/yolov4-custom.cfg"
-weights_path = "weights/yolov4-custom_best.weights"
-# weights_path = "weights/yolov4-custom_last.weights"
+# weights_path = "weights/yolov4-custom_best.weights"
+weights_path = "weights/yolov4-custom_last.weights"
 
 # loading all the class labels (objects)
 labels = open("data/obj.names").read().strip().split("\n")
@@ -20,7 +20,8 @@ colors = np.random.randint(0, 255, size=(len(labels), 3), dtype="uint8")
 # load the YOLO network
 net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
 
-path_name = "examples/12.jpg_original"
+# path_name = "examples/12.jpg_original"
+path_name = "examples/3.jpg"
 # path_name = sys.argv[1]
 image = cv2.imread(path_name)
 file_name = os.path.basename(path_name)
