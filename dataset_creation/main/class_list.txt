@@ -8,5 +8,3 @@ tablet
 watch
 laptopkeyboard
 earphones
-translate
-not_translate
