@@ -134,5 +134,4 @@ dmypy.json
 # secret
 config.ini
 protocol.conf
-tutorials/yolo_tut/yolov3.weights
-
+yolov4/weights/
