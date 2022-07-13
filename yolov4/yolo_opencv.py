@@ -11,8 +11,8 @@ SCORE_THRESHOLD = 0.5
 IOU_THRESHOLD = 0.5
 
 config_path = "cfg/yolov4-custom.cfg"
-# weights_path = "weights/yolov4-custom_best.weights"
-weights_path = "weights/yolov4-custom_last.weights"
+weights_path = "weights/yolov4-custom_best.weights"
+# weights_path = "weights/yolov4-custom_last.weights"
 
 # loading all the class labels (objects)
 labels = open("data/obj.names").read().strip().split("\n")
@@ -120,4 +120,4 @@ for path_name in images:
     # if cv2.waitKey(0) == ord("q"):
     #     pass
 
-    cv2.imwrite(f"results/{filename}_yolo3.{ext}", image)
+    cv2.imwrite(f"results/{filename}_yolo3_best.{ext}", image)
